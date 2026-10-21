@@ -19,12 +19,16 @@
       background-color: #eef2ff;
     }
     .draggable-card {
-      cursor: grab;
+      cursor: pointer;
       user-select: none;
-      touch-action: none;
+      touch-action: manipulation;
     }
-    .draggable-card:active {
-      cursor: grabbing;
+    .card-selected {
+      ring: 3px;
+      border-color: #f59e0b !important;
+      background-color: #fef3c7 !important;
+      color: #92400e !important;
+      transform: scale(1.03);
     }
   </style>
 </head>
@@ -57,7 +61,7 @@
           <i class="ph ph-books text-4xl"></i>
         </div>
         <h2 class="text-2xl md:text-3xl font-extrabold text-slate-800">Chọn Bài Ôn Tập</h2>
-        <p class="text-slate-500 text-sm mt-2">Hệ thống ngân hàng câu hỏi chuẩn 100%: 1 đáp án (A,B,C,D), nhiều đáp án, kéo thả ghép nối chuẩn xác.</p>
+        <p class="text-slate-500 text-sm mt-2">Hệ thống trắc nghiệm tối ưu cho cả máy tính & điện thoại (hỗ trợ bấm chạm chọn thẻ hoặc kéo thả tiện lợi).</p>
       </div>
 
       <div class="space-y-6">
@@ -211,7 +215,6 @@
   </footer>
 
   <script>
-    // Ngân hàng câu hỏi chuẩn xác 100% dạng bài
     const BANK = [
       // BÀI 1
       { lesson: 1, type: "MATCHING", text: "Câu 1: Hãy ghép nối công cụ/chiến lược tương ứng với mục tiêu Marketing.", pairs: [{ item: "Paid Ads", match: "Đẩy" }, { item: "SEO/Content", match: "Kéo" }, { item: "Automation/Chatbot", match: "Giữ chân" }] },
@@ -312,7 +315,7 @@
       { lesson: 4, type: "SINGLE", text: "Câu 1: Content Marketing khác với quảng cáo truyền thống ở điểm nào sau đây?", options: ["A. Không sử dụng hình ảnh và video", "B. Tập trung cung cấp nội dung giá trị thay vì quảng cáo lộ liễu sản phẩm", "C. Có tính quảng cáo trực tiếp và rõ ràng hơn", "D. Chỉ sử dụng cho bán hàng offline"], correct: [1] },
       { lesson: 4, type: "SINGLE", text: "Câu 2: Tại sao cần tính \"nhất quán\" trong Content Marketing?", options: ["A. Khách hàng hiểu đúng thương hiệu", "B. Đăng nhiều bài", "C. Tiết kiệm chi phí", "D. Giảm nhân sự"], correct: [0] },
       { lesson: 4, type: "SINGLE", text: "Câu 3: Landing page có video giúp gì?", options: ["A. Giảm thoát trang", "B. Tăng chia sẻ", "C. Tăng chuyển đổi", "D. Giảm chi phí"], correct: [2] },
-      { lesson: 4, type: "MATCHING", text: "Câu 4: Kéo thả xác định nhận định Đúng/Sai về Content Marketing:", pairs: [{ item: "Content Marketing giúp xây dựng mối quan hệ dài hạn", match: "ĐÚNG" }, { item: "Content Marketing cung cấp nội dung giá trị", match: "ĐÚNG" }, { item: "Content Marketing chỉ tập trung quảng cáo bán hàng trực tiếp", match: "SAI" }] },
+      { lesson: 4, type: "MATCHING", text: "Câu 4: Kéo thả/chọn thẻ ghép Đúng/Sai về Content Marketing:", pairs: [{ item: "Content Marketing giúp xây dựng mối quan hệ dài hạn", match: "ĐÚNG" }, { item: "Content Marketing cung cấp nội dung giá trị", match: "ĐÚNG" }, { item: "Content Marketing chỉ tập trung quảng cáo bán hàng trực tiếp", match: "SAI" }] },
       { lesson: 4, type: "SINGLE", text: "Câu 5: Trong mô hình 5W-1H, \"Who\" là xác định .... của chiến dịch.", options: ["A. Đối tượng", "B. Mục tiêu", "C. Thời gian", "D. Nội dung"], correct: [0] },
       { lesson: 4, type: "MATCHING", text: "Câu 6: Ghép định dạng content với mô tả tương ứng:", pairs: [{ item: "Nội dung hình ảnh thu hút thị giác", match: "Image" }, { item: "Nội dung chữ có từ khóa SEO", match: "Article" }, { item: "Nội dung kết hợp âm thanh và hình ảnh", match: "Video" }] },
       { lesson: 4, type: "MATCHING", text: "Câu 7: Ghép loại content với đặc điểm tương ứng:", pairs: [{ item: "Meme", match: "Dễ lan truyền, hài hước" }, { item: "Infographics", match: "Trực quan hóa dữ liệu" }, { item: "Video Marketing", match: "Tăng khả năng ghi nhớ nội dung" }] },
@@ -356,7 +359,7 @@
       { lesson: 5, type: "MATCHING", text: "Câu 16: Ghép thành phần của mô hình POEM với ví dụ phù hợp:", pairs: [{ item: "Owned Media", match: "Website chính thức của doanh nghiệp" }, { item: "Earned Media", match: "Bài đăng đánh giá tự nhiên của khách" }, { item: "Paid Media", match: "Quảng cáo Facebook Ads" }] },
       { lesson: 5, type: "MULTIPLE", text: "Câu 17: Sàn TMĐT dùng AI điều chỉnh giá theo nhu cầu và đề xuất sản phẩm. Nhận định đúng: (Chọn 2)", options: ["A. Cá nhân hóa trải nghiệm sản phẩm.", "B. Phân biệt giá theo khu vực địa lý.", "C. Định giá theo chi phí cộng lãi.", "D. Định giá động."], correct: [0, 3] },
       { lesson: 5, type: "MULTIPLE", text: "Câu 18: Đâu là hai nhận định đúng về chiến lược sản phẩm? (Chọn 2 đáp án)", options: ["A. Chiến lược sản phẩm là cơ sở để xây dựng giá, phân phối, xúc tiến.", "B. Chiến lược sản phẩm chỉ tập trung sản xuất.", "C. Chiến lược sản phẩm xác định phục vụ ai và mang lại lợi ích gì.", "D. Chiến lược sản phẩm chỉ áp dụng cho sản phẩm vật chất."], correct: [0, 2] },
-      { lesson: 5, type: "MATCHING", text: "Câu 19: Kéo thả ghép nhận định Đúng/Sai về tối ưu trải nghiệm khách hàng:", pairs: [{ item: "Doanh nghiệp đang cá nhân hóa sản phẩm", match: "ĐÚNG" }, { item: "Việc này hoàn toàn không liên quan Marketing số", match: "SAI" }, { item: "Dữ liệu hành vi được dùng nâng cao trải nghiệm", match: "ĐÚNG" }] },
+      { lesson: 5, type: "MATCHING", text: "Câu 19: Ghép nhận định Đúng/Sai về tối ưu trải nghiệm khách hàng:", pairs: [{ item: "Doanh nghiệp đang cá nhân hóa sản phẩm", match: "ĐÚNG" }, { item: "Việc này hoàn toàn không liên quan Marketing số", match: "SAI" }, { item: "Dữ liệu hành vi được dùng nâng cao trải nghiệm", match: "ĐÚNG" }] },
       { lesson: 5, type: "MULTIPLE", text: "Câu 20: Doanh nghiệp có thể bán sản phẩm với giá cao hơn khi: (Chọn 2 đáp án)", options: ["A. Sản phẩm có sự khác biệt rõ ràng so với đối thủ.", "B. Sản phẩm không có giá trị nổi bật.", "C. Thương hiệu được định vị cao cấp.", "D. Khách hàng có nhiều sản phẩm thay thế giống hệt."], correct: [0, 2] },
       { lesson: 5, type: "SINGLE", text: "Câu 21: Ba mâu thuẫn cơ bản mà kênh phân phối giúp giải quyết là gì?", options: ["A. Mâu thuẫn về giá, thương hiệu và quảng cáo.", "B. Mâu thuẫn về khối lượng, không gian và thời gian.", "C. Mâu thuẫn về sản xuất và tài chính.", "D. Mâu thuẫn về công nghệ và nhân lực."], correct: [1] },
       { lesson: 5, type: "MULTIPLE", text: "Câu 22: Doanh nghiệp áp dụng hệ thống phân phối đa kênh (MDS) nhằm: (Chọn 2 đáp án)", options: ["A. Tiếp cận nhiều phân đoạn khách hàng hơn.", "B. Giảm hoàn toàn xung đột giữa các kênh.", "C. Sử dụng đồng thời nhiều kênh bán hàng khác nhau.", "D. Chỉ bán hàng qua internet."], correct: [0, 2] },
@@ -502,6 +505,7 @@
     let userAnswers = {};
     let checkedState = {};
     let isSubmitted = false;
+    let selectedCardText = ''; // Lưu thẻ đang được người dùng bấm chọn
 
     function shuffleArray(arr) {
       let array = [...arr];
@@ -530,6 +534,7 @@
       userAnswers = {};
       checkedState = {};
       isSubmitted = false;
+      selectedCardText = '';
 
       document.getElementById('start-view').classList.add('hidden');
       document.getElementById('result-view').classList.add('hidden');
@@ -576,17 +581,24 @@
           container.appendChild(btn);
         });
       } else if (q.type === 'MATCHING') {
-        // Drag & Drop Matching Implementation
-        const matchesOptions = shuffleArray(Array.from(new Set(q.pairs.map(p => p.match))));
+        // Drag and Click Matching
+        const matchesOptions = Array.from(new Set(q.pairs.map(p => p.match)));
         
         let poolHtml = `<div class="mb-4 p-4 bg-indigo-50/50 rounded-xl border border-indigo-100">
-          <div class="text-xs font-bold text-indigo-800 mb-2 uppercase tracking-wider">Danh sách thẻ đáp án (Kéo thả hoặc bấm chọn):</div>
+          <div class="text-xs font-bold text-indigo-800 mb-2 uppercase tracking-wider">Danh sách thẻ đáp án (Bấm chọn hoặc Kéo thả):</div>
           <div id="drag-pool" class="flex flex-wrap gap-2 min-h-[48px]">`;
         
         matchesOptions.forEach((mOpt) => {
           const isPlaced = savedAns && Object.values(savedAns).includes(mOpt);
           if (!isPlaced) {
-            poolHtml += `<div draggable="true" ondragstart="handleDragStart(event, '${mOpt}')" onclick="handleCardClick('${mOpt}')" class="draggable-card px-4 py-2 bg-white text-indigo-700 font-semibold text-sm rounded-lg border border-indigo-200 shadow-sm hover:shadow transition flex items-center gap-1.5"><i class="ph ph-dots-six-vertical text-slate-400"></i>${mOpt}</div>`;
+            const isSelected = selectedCardText === mOpt;
+            poolHtml += `<div draggable="true" 
+              ondragstart="handleDragStart(event, '${mOpt}')" 
+              onclick="handleCardClick('${mOpt}')" 
+              class="draggable-card px-4 py-2.5 bg-white text-indigo-700 font-semibold text-sm rounded-xl border border-indigo-200 shadow-sm hover:shadow transition flex items-center gap-2 ${isSelected ? 'card-selected' : ''}">
+              <i class="ph ph-hand-tap text-amber-500"></i>
+              <span>${mOpt}</span>
+            </div>`;
           }
         });
         poolHtml += `</div></div>`;
@@ -597,8 +609,8 @@
           slotsHtml += `<div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
             <span class="font-medium text-slate-700 text-sm md:text-base">${pair.item}</span>
             <i class="ph ph-arrow-right text-slate-400 hidden md:inline"></i>
-            <div ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${pairIdx})" onclick="handleSlotClick(${pairIdx})" class="drop-zone w-full md:w-64 rounded-xl flex items-center justify-center p-2 bg-white text-sm font-medium">
-              ${placedVal ? `<span class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg font-semibold text-xs flex items-center gap-2">${placedVal} <i class="ph ph-x hover:text-amber-200" onclick="event.stopPropagation(); removeMatchingPair(${pairIdx})"></i></span>` : `<span class="text-slate-400 text-xs italic">Kéo thả hoặc bấm chọn thẻ vào đây</span>`}
+            <div ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${pairIdx})" onclick="handleSlotClick(${pairIdx})" class="drop-zone w-full md:w-64 rounded-xl flex items-center justify-center p-2 bg-white text-sm font-medium cursor-pointer">
+              ${placedVal ? `<span class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg font-semibold text-xs flex items-center justify-between w-full"><span>${placedVal}</span> <i class="ph ph-x-circle text-base hover:text-rose-300 ml-2" onclick="event.stopPropagation(); removeMatchingPair(${pairIdx})"></i></span>` : `<span class="text-slate-400 text-xs italic">Kéo thả hoặc Bấm chọn thẻ vào đây</span>`}
             </div>
           </div>`;
         });
@@ -639,9 +651,8 @@
       }
     }
 
-    // Drag and Drop State
+    // Drag and Drop & Touch/Click Logic
     let draggedText = '';
-    let selectedCardText = '';
 
     function handleDragStart(e, text) {
       draggedText = text;
@@ -659,22 +670,34 @@
       e.currentTarget.classList.remove('drag-over');
       if (!userAnswers[currentIndex]) userAnswers[currentIndex] = {};
       userAnswers[currentIndex][pairIdx] = draggedText;
+      selectedCardText = '';
       renderQuestion();
     }
 
+    // Bấm chọn thẻ
     function handleCardClick(text) {
-      selectedCardText = text;
-      alert(`Đã chọn thẻ "${text}". Hãy bấm vào ô trống để thả!`);
+      if (isSubmitted) return;
+      if (selectedCardText === text) {
+        selectedCardText = ''; // Hủy chọn nếu bấm lại chính thẻ đó
+      } else {
+        selectedCardText = text; // Chọn thẻ mới
+      }
+      renderQuestion();
     }
+
+    // Bấm thả vào ô
     function handleSlotClick(pairIdx) {
+      if (isSubmitted) return;
       if (selectedCardText) {
         if (!userAnswers[currentIndex]) userAnswers[currentIndex] = {};
         userAnswers[currentIndex][pairIdx] = selectedCardText;
-        selectedCardText = '';
+        selectedCardText = ''; // Trả về trạng thái chưa chọn thẻ nào
         renderQuestion();
       }
     }
+
     function removeMatchingPair(pairIdx) {
+      if (isSubmitted) return;
       if (userAnswers[currentIndex] && userAnswers[currentIndex][pairIdx]) {
         delete userAnswers[currentIndex][pairIdx];
         renderQuestion();
@@ -705,6 +728,7 @@
     }
 
     function navigateQuestion(step) {
+      selectedCardText = '';
       const newIdx = currentIndex + step;
       if (newIdx >= 0 && newIdx < currentQuestions.length) {
         currentIndex = newIdx;
@@ -772,6 +796,7 @@
       userAnswers = {};
       checkedState = {};
       isSubmitted = false;
+      selectedCardText = '';
 
       document.getElementById('result-view').classList.add('hidden');
       document.getElementById('quiz-view').classList.remove('hidden');
@@ -817,6 +842,7 @@
 
           btn.onclick = () => {
             currentIndex = idx;
+            selectedCardText = '';
             renderQuestion();
             toggleQuestionGrid();
           };
