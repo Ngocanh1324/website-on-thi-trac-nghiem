@@ -62,7 +62,7 @@
 <div class="container">
     <header>
         <h1>ÔN THI TRẮC NGHIỆM TRỰC TUYẾN</h1>
-        <p>Hệ thống ôn tập theo bài & Thi thử hỗn hợp 50 câu</p>
+        <p>Hệ thống ngân hàng câu hỏi đầy đủ từ tài liệu ôn tập</p>
     </header>
 
     <div id="selection-screen">
@@ -83,7 +83,7 @@
         </div>
 
         <button class="btn" id="start-btn" onclick="startQuiz()" disabled>Bắt Đầu Ôn Tập Theo Bài Này</button>
-        <button class="btn btn-exam" id="exam-btn" onclick="startExamSimulator()" disabled>🚀 Thi Thử Hỗn Hợp 50 Câu (Như Thật)</button>
+        <button class="btn btn-exam" id="exam-btn" onclick="startExamSimulator()" disabled>🚀 Thi Thử Hỗn Hợp 50 Câu Ngẫu Nhiên</button>
     </div>
 
     <div id="quiz-screen" style="display: none;">
@@ -111,48 +111,146 @@ const quizDatabase = {
     hvtnd: {
         title: "Hành Vi Người Tiêu Dùng",
         chapters: {
-            "bai1": "Bài 1: Tổng quan về Hành vi Người tiêu dùng",
-            "bai2": "Bài 2: Phân loại & Chân dung Khách hàng",
-            "bai3": "Bài 3: Yếu tố Nhân khẩu học & Lối sống",
-            "bai4": "Bài 4: Động cơ, Nhận thức, Trí nhớ & Thái độ",
-            "bai5": "Bài 5: Yếu tố Xã hội, Văn hóa & Nhóm tham khảo",
-            "bai6": "Bài 6: Hành trình & Quyết định mua hàng",
-            "bai7": "Bài 7: Phương pháp Nghiên cứu Hành vi Người tiêu dùng",
-            "bai8": "Bài 8: Hành vi Tiêu dùng trong Môi trường Số",
-            "bai9": "Bài 9: Cá nhân hóa & Thông điệp Truyền thông"
+            "bai1": "Bài 1: Tổng quan về Hành vi Người tiêu dùng (30 câu)",
+            "bai2": "Bài 2: Phân loại & Chân dung Khách hàng (30 câu)",
+            "bai3": "Bài 3: Yếu tố Nhân khẩu học & Lối sống (30 câu)",
+            "bai4": "Bài 4: Động cơ, Nhận thức, Trí nhớ & Thái độ (29 câu)",
+            "bai5": "Bài 5: Yếu tố Xã hội, Văn hóa & Nhóm tham khảo (31 câu)",
+            "bai6": "Bài 6: Hành trình & Quá trình Ra quyết định mua (27 câu)",
+            "bai7": "Bài 7: Nghiên cứu Hành vi Người tiêu dùng (33 câu)",
+            "bai8": "Bài 8: Hành vi Tiêu dùng trong Môi trường Số (35 câu)",
+            "bai9": "Bài 9: Cá nhân hóa & Thông điệp Truyền thông (19 câu)"
         },
         questions: [
-            { chapter: "bai1", q: "Trong nghiên cứu hành vi người tiêu dùng thì 'Người tiêu dùng' bao gồm những đối tượng nào? (Chọn 2)", options: ["Chỉ những cá nhân trực tiếp sử dụng sản phẩm.", "Cá nhân hoặc nhóm người có nhu cầu và tham gia vào quá trình lựa chọn, mua sắm.", "Những cá nhân có liên quan đến quá trình ra quyết định mua hàng.", "Chỉ các tổ chức đại diện cho tập thể mua sắm."], correct: [1, 2], multi: true },
-            { chapter: "bai1", q: "Hành vi người tiêu dùng nghiên cứu các hoạt động nào của cá nhân, nhóm hoặc tổ chức? (Chọn 2)", options: ["Việc đánh giá và loại bỏ sản phẩm, dịch vụ nhằm thỏa mãn nhu cầu.", "Quá trình sản xuất và phân phối hàng hóa của doanh nghiệp.", "Cách thức lựa chọn, mua sắm và sử dụng sản phẩm.", "Việc thiết lập giá thành sản phẩm trên thị trường."], correct: [0, 2], multi: true },
-            { chapter: "bai1", q: "Xác định nhận định sau về bản chất của hành vi người tiêu dùng: Hành vi người tiêu dùng là một quá trình liên tục, không kết thúc sau khi mua hàng.", options: ["Đúng", "Sai"], correct: [0], multi: false },
-            { chapter: "bai1", q: "Một sinh viên sử dụng máy tính để học tập, phụ huynh thanh toán tiền mua và cả hai cùng thảo luận lựa chọn sản phẩm. Sinh viên đồng thời là người mua sản phẩm. Nhận định này Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [1], multi: false },
-            { chapter: "bai1", q: "Nghiên cứu hành vi người tiêu dùng giúp doanh nghiệp thực hiện các hoạt động nào trong chiến lược Marketing? (Chọn 2)", options: ["Tăng lương cho nhân viên sản xuất.", "Quản lý nguồn vốn vay dài hạn.", "Phân đoạn thị trường.", "Định vị thương hiệu."], correct: [2, 3], multi: true },
-            { chapter: "bai2", q: "Phân loại khách hàng theo nhân khẩu học dựa trên những đặc điểm nào sau đây? (Chọn 2)", options: ["Vị trí địa lý và điều kiện khí hậu.", "Thu nhập và nghề nghiệp.", "Độ tuổi và giới tính.", "Lối sống và giá trị cá nhân."], correct: [1, 2], multi: true },
-            { chapter: "bai2", q: "Vì sao phân loại khách hàng theo nhân khẩu học được sử dụng phổ biến trong marketing?", options: ["Vì dữ liệu dễ thu thập và liên quan trực tiếp đến nhu cầu tiêu dùng.", "Vì không cần thu thập thông tin khách hàng.", "Vì giúp dự đoán mọi hành vi mua hàng.", "Vì phản ánh chính xác cảm xúc của khách hàng."], correct: [0], multi: false },
-            { chapter: "bai3", q: "Mô hình AIO trong phân tích phong cách sống bao gồm những yếu tố nào?", options: ["Activities – Interests – Opinions", "Attitude – Identity – Outcome", "Age – Income – Occupation", "Action – Insight – Objective"], correct: [0], multi: false },
-            { chapter: "bai4", q: "Theo lý thuyết của Maslow, nhu cầu nào là cấp độ cao nhất?", options: ["Nhu cầu xã hội", "Nhu cầu tự khẳng định", "Nhu cầu an toàn", "Nhu cầu được tôn trọng"], correct: [1], multi: false },
-            { chapter: "bai5", q: "Những yếu tố nào được coi là 'Bằng chứng xã hội' (Social Proof) trong thương mại điện tử? (Chọn 2)", options: ["Tên gọi của thương hiệu.", "Điểm đánh giá (ratings) và lượt bình luận của người mua trước.", "Giá niêm yết của sản phẩm.", "Số lượng sản phẩm đã bán."], correct: [1, 3], multi: true }
+            // BÀI 1
+            { chapter: "bai1", q: "1. Trong nghiên cứu hành vi người tiêu dùng thì 'Người tiêu dùng' bao gồm những đối tượng nào? (Chọn 2 đáp án)", options: ["Chỉ những cá nhân trực tiếp sử dụng sản phẩm.", "Cá nhân hoặc nhóm người có nhu cầu và tham gia vào quá trình lựa chọn, mua sắm.", "Những cá nhân có liên quan đến quá trình ra quyết định mua hàng.", "Chỉ các tổ chức đại diện cho tập thể mua sắm."], correct: [1, 2], multi: true },
+            { chapter: "bai1", q: "2. Hành vi người tiêu dùng (Consumer Behavior) nghiên cứu các hoạt động nào của cá nhân, nhóm hoặc tổ chức? (Chọn 2 đáp án)", options: ["Việc đánh giá và loại bỏ sản phẩm, dịch vụ nhằm thỏa mãn nhu cầu.", "Quá trình sản xuất và phân phối hàng hóa của doanh nghiệp.", "Cách thức lựa chọn, mua sắm và sử dụng sản phẩm.", "Việc thiết lập giá thành sản phẩm trên thị trường."], correct: [0, 2], multi: true },
+            { chapter: "bai1", q: "3. Bản chất của hành vi người tiêu dùng: 'Hành vi chỉ bao gồm các hành động quan sát được như tìm kiếm thông tin'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [1], multi: false },
+            { chapter: "bai1", q: "4. Bản chất của hành vi người tiêu dùng: 'Hành vi người tiêu dùng là một quá trình liên tục, không kết thúc sau khi mua hàng'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [0], multi: false },
+            { chapter: "bai1", q: "5. Bản chất của hành vi người tiêu dùng: 'Các yếu tố tâm lý như động cơ và niềm tin cũng thuộc phạm vi nghiên cứu hành vi'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [0], multi: false },
+            { chapter: "bai1", q: "6. Bản chất của hành vi người tiêu dùng: 'Mục tiêu cuối cùng là mang lại lợi nhuận cao nhất cho người bán'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [1], multi: false },
+            { chapter: "bai1", q: "7. Giai đoạn 'Trước mua': 'Tìm kiếm thông tin chỉ được thực hiện từ nguồn quảng cáo của doanh nghiệp'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [1], multi: false },
+            { chapter: "bai1", q: "8. Giai đoạn 'Trước mua': 'Người tiêu dùng sử dụng thông tin để so sánh các phương án dựa trên giá cả, chất lượng'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [0], multi: false },
+            { chapter: "bai1", q: "9. Giai đoạn 'Trước mua': 'Đây là giai đoạn người tiêu dùng nhận thức được nhu cầu hoặc vấn đề'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [0], multi: false },
+            { chapter: "bai1", q: "10. Giai đoạn 'Trước mua': 'Việc xem review trên YouTube thuộc giai đoạn Trong mua'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [1], multi: false },
+            { chapter: "bai1", q: "11. 'Việc lựa chọn phương thức thanh toán là một hoạt động trong giai đoạn Trong mua'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [0], multi: false },
+            { chapter: "bai1", q: "12. 'Hành vi người tiêu dùng chỉ chịu ảnh hưởng duy nhất bởi nhu cầu cá nhân'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [1], multi: false },
+            { chapter: "bai1", q: "13. 'Quyết định mua hàng không bị tác động bởi các yếu tố tình huống tại điểm bán'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [1], multi: false },
+            { chapter: "bai1", q: "14. 'Động cơ tiêu dùng là một phần của hành vi suy nghĩ bên trong'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [0], multi: false },
+            { chapter: "bai1", q: "15. Một sinh viên sử dụng máy tính để học tập, phụ huynh thanh toán tiền mua và cả hai cùng thảo luận lựa chọn sản phẩm. Những nhận định nào sau đây là đúng? (Chọn 2 đáp án)", options: ["Không có người ra quyết định mua.", "Sinh viên là người sử dụng sản phẩm.", "Sinh viên đồng thời là người mua sản phẩm.", "Phụ huynh là người mua sản phẩm."], correct: [1, 3], multi: true },
+            { chapter: "bai1", q: "16. Điền từ thích hợp vào chỗ trống: Trong ví dụ một gia đình mua tivi, con cái muốn xem phim là người ...", options: ["Đề xuất", "Mua hàng", "Sản xuất", "Thanh toán"], correct: [0], multi: false },
+            { chapter: "bai1", q: "17. Nghiên cứu hành vi người tiêu dùng giúp doanh nghiệp thực hiện các hoạt động nào trong chiến lược Marketing? (Chọn 2 đáp án)", options: ["Tăng lương cho nhân viên sản xuất.", "Quản lý nguồn vốn vay dài hạn.", "Phân đoạn thị trường.", "Định vị thương hiệu."], correct: [2, 3], multi: true },
+            { chapter: "bai1", q: "18. Phân tích hành vi trong chăm sóc khách hàng: 'Hiểu hành vi sau mua giúp cá nhân hóa các chương trình chăm sóc'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [0], multi: false },
+            { chapter: "bai1", q: "19. Việc nghiên cứu hành vi người tiêu dùng hỗ trợ doanh nghiệp phân đoạn thị trường vì: (Chọn 2 đáp án)", options: ["Giúp bán cùng một sản phẩm cho tất cả khách hàng.", "Giúp loại bỏ hoàn toàn đối thủ cạnh tranh.", "Giúp tập trung nguồn lực vào nhóm khách hàng tiềm năng.", "Giúp nhận diện các nhóm khách hàng có nhu cầu và hành vi tương đồng."], correct: [2, 3], multi: true },
+            { chapter: "bai1", q: "20. Nghiên cứu hành vi có vai trò quan trọng trong chăm sóc khách hàng vì: (Chọn 2 đáp án)", options: ["Giúp xây dựng các chương trình chăm sóc và khách hàng thân thiết phù hợp.", "Giúp doanh nghiệp hiểu mức độ hài lòng và trải nghiệm sau mua.", "Giúp không cần nâng cao chất lượng dịch vụ.", "Giúp không cần tiếp nhận phản hồi."], correct: [0, 1], multi: true },
+            { chapter: "bai1", q: "21. Theo khái niệm hành vi người tiêu dùng, những hoạt động nào thuộc phạm vi nghiên cứu? (Chọn 2 đáp án)", options: ["Tìm kiếm thông tin về sản phẩm trước khi mua.", "Đánh giá mức độ hài lòng sau khi sử dụng.", "Quản lý nhân sự của doanh nghiệp.", "Sản xuất sản phẩm trong doanh nghiệp."], correct: [0, 1], multi: true },
+            { chapter: "bai1", q: "22. Chương trình khách hàng thân thiết (Loyalty Program) là ứng dụng của nghiên cứu hành vi trong:", options: ["Chăm sóc khách hàng", "Lựa chọn kênh phân phối", "Định giá sản phẩm", "Phân đoạn thị trường"], correct: [0], multi: false },
+            { chapter: "bai1", q: "23. Vai trò phân tích hành vi trong phát triển sản phẩm: 'Doanh nghiệp cải tiến sản phẩm dựa trên phản hồi của khách hàng sau khi sử dụng'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [0], multi: false },
+            { chapter: "bai1", q: "24. Vai trò phân tích hành vi trong quảng cáo: 'Chiến dịch Đi để trở về của Biti's thành công nhờ thấu hiểu tâm lý giới trẻ'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [0], multi: false },
+            { chapter: "bai1", q: "25. Trong quy trình nghiên cứu hành vi người tiêu dùng, bước đầu tiên là:", options: ["Phân tích thị trường và khách hàng", "Xây dựng chương trình khách hàng thân thiết", "Triển khai chiến dịch quảng cáo", "Xây dựng kế hoạch marketing"], correct: [0], multi: false },
+            { chapter: "bai1", q: "26. Nhiều sản phẩm thất bại trên thị trường dù chất lượng tốt vì:", options: ["Khách hàng không quan tâm đến sản phẩm mới", "Thị trường không tồn tại nhu cầu", "Doanh nghiệp chưa hiểu đúng nhu cầu thực tế của khách hàng", "Giá bán luôn thấp hơn đối thủ"], correct: [2], multi: false },
+            { chapter: "bai1", q: "27. Trong phát triển sản phẩm, nghiên cứu hành vi mang lại lợi ích nào? (Chọn 2 đáp án)", options: ["Giúp hiểu nhu cầu và mong muốn thực tế của khách hàng.", "Đảm bảo sản phẩm chắc chắn thành công.", "Giúp cải tiến sản phẩm dựa trên phản hồi và trải nghiệm.", "Không cần thử nghiệm sản phẩm mới."], correct: [0, 2], multi: true },
+            { chapter: "bai1", q: "28. Một trong những lợi ích của việc nghiên cứu hành vi người tiêu dùng là:", options: ["Nâng cao hiệu quả hoạt động marketing", "Loại bỏ hoàn toàn đối thủ cạnh tranh", "Giảm giá tất cả sản phẩm", "Tăng quy mô doanh nghiệp ngay lập tức"], correct: [0], multi: false },
+            { chapter: "bai1", q: "29. Doanh nghiệp nghiên cứu các yếu tố văn hóa, xã hội, cá nhân và tâm lý của khách hàng để:", options: ["Lựa chọn nhà cung cấp nguyên liệu", "Xây dựng cơ cấu tổ chức", "Hiểu những yếu tố ảnh hưởng đến quyết định mua hàng", "Xác định quy trình sản xuất"], correct: [2], multi: false },
+            { chapter: "bai1", q: "30. Vai trò phân loại trong Marketing: 'Giúp tối ưu hóa chi phí vận chuyển và phân phối'. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [0], multi: false },
+
+            // BÀI 2
+            { chapter: "bai2", q: "1. Phân loại khách hàng theo nhân khẩu học (Demographics) dựa trên những đặc điểm nào? (Chọn 2 đáp án)", options: ["Vị trí địa lý và điều kiện khí hậu.", "Thu nhập và nghề nghiệp.", "Độ tuổi và giới tính.", "Lối sống và giá trị cá nhân."], correct: [1, 2], multi: true },
+            { chapter: "bai2", q: "2. Vì sao phân loại khách hàng theo nhân khẩu học được sử dụng phổ biến trong marketing?", options: ["Vì dữ liệu dễ thu thập và liên quan trực tiếp đến nhu cầu tiêu dùng.", "Vì không cần thu thập thông tin khách hàng.", "Vì giúp dự đoán mọi hành vi mua hàng.", "Vì phản ánh chính xác cảm xúc."], correct: [0], multi: false },
+            { chapter: "bai2", q: "3. Hai khách hàng có cùng độ tuổi và thu nhập nhưng lựa chọn sản phẩm khác nhau có thể do: (Chọn 2 đáp án)", options: ["Lối sống khác nhau.", "Cùng sống trong một thành phố.", "Giá trị cá nhân khác nhau.", "Cùng giới tính."], correct: [0, 2], multi: true },
+            { chapter: "bai2", q: "4. Phân loại theo tâm lý mang lại giá trị cao hơn nhân khẩu học vì: (Chọn 2 đáp án)", options: ["Hỗ trợ xây dựng thông điệp marketing phù hợp giá trị/lối sống.", "Giúp doanh nghiệp hiểu động cơ sâu xa đằng sau quyết định mua.", "Dữ liệu luôn dễ thu thập hơn.", "Không cần kết hợp tiêu chí khác."], correct: [0, 1], multi: true },
+            { chapter: "bai2", q: "5. Sữa bổ sung canxi của Vinamilk hướng đến đối tượng nào?", options: ["Theo độ tuổi (Người già)", "Theo độ tuổi (Trẻ em)", "Theo lối sống vóc dáng", "Mọi lứa tuổi"], correct: [0], multi: false },
+            { chapter: "bai2", q: "13. Điền từ còn thiếu: Chiến lược ____ giúp nhắc nhở khách hàng về đôi giày họ đã bỏ vào giỏ hàng nhưng chưa thanh toán.", options: ["Remarketing", "Email Marketing", "SEO", "Livestream"], correct: [0], multi: false },
+            { chapter: "bai2", q: "21. Tiêu chí nào thuộc phân loại khách hàng theo địa lý?", options: ["Lòng trung thành thương hiệu", "Tần suất mua hàng", "Trình độ học vấn", "Khu vực đô thị và nông thôn"], correct: [3], multi: false },
+            { chapter: "bai2", q: "27. Remarketing giúp doanh nghiệp: (Chọn 2 đáp án)", options: ["Tăng tỷ lệ chuyển đổi.", "Không cần quảng cáo.", "Tiếp cận lại khách hàng đã quan tâm sản phẩm.", "Xóa dữ liệu khách hàng cũ."], correct: [0, 2], multi: true },
+            { chapter: "bai2", q: "28. Dịch vụ _____ như bảo hành, giải quyết khiếu nại nhanh chóng là yếu tố then chốt để khách quay lại.", options: ["Hậu mãi", "Khuyến mại", "Chăm sóc", "Tư vấn"], correct: [0], multi: false },
+            { chapter: "bai2", q: "30. Theo tài liệu, yếu tố nào xác định trực tiếp khả năng chi trả của khách hàng?", options: ["Thu nhập", "Trình độ học vấn", "Nghề nghiệp", "Tình trạng hôn nhân"], correct: [0], multi: false },
+
+            // BÀI 3
+            { chapter: "bai3", q: "1. Tiêu chí nào thuộc nhóm phân loại theo nhân khẩu học? (Chọn 2 đáp án)", options: ["Thu nhập và nghề nghiệp", "Lối sống và sở thích", "Vùng miền và khí hậu", "Độ tuổi và giới tính"], correct: [0, 3], multi: true },
+            { chapter: "bai3", q: "14. Phong cách sống của khách hàng được phân tích thông qua mô hình AIO, bao gồm Activities, Interests và ____.", options: ["Opinions", "Outcome", "Objective", "Option"], correct: [0], multi: false },
+            { chapter: "bai3", q: "24. Mô hình AIO trong phân tích phong cách sống bao gồm những yếu tố nào?", options: ["Activities – Interests – Opinions", "Attitude – Identity – Outcome", "Age – Income – Occupation", "Action – Insight – Objective"], correct: [0], multi: false },
+            { chapter: "bai3", q: "29. Doanh nghiệp phân loại khách hàng theo địa lý nhằm mục đích chính nào?", options: ["Hiểu sự khác biệt về nhu cầu và hành vi tiêu dùng giữa các khu vực", "Đo lường động cơ mua hàng", "Xác định tính cách của khách hàng", "Đánh giá mức độ trung thành"], correct: [0], multi: false },
+
+            // BÀI 4
+            { chapter: "bai4", q: "3. Theo lý thuyết của Maslow, nhu cầu nào là cấp độ cao nhất?", options: ["Nhu cầu xã hội", "Nhu cầu tự khẳng định", "Nhu cầu an toàn", "Nhu cầu được tôn trọng"], correct: [1], multi: false },
+            { chapter: "bai4", q: "6. Quá trình cá nhân lựa chọn, tổ chức và diễn giải thông tin thành hiểu biết có ý nghĩa gọi là ____.", options: ["Nhận thức", "Trí nhớ", "Học hỏi", "Động cơ"], correct: [0], multi: false },
+            { chapter: "bai4", q: "20. Động cơ tiêu dùng được hiểu là gì?", options: ["Là trạng thái thiếu hụt vật chất.", "Là lực lượng thúc đẩy bên trong khiến cá nhân hành động nhằm thỏa mãn nhu cầu.", "Là điểm khởi đầu mọi hành vi.", "Là kết quả cuối cùng sau khi sử dụng."], correct: [1], multi: false },
+
+            // BÀI 5
+            { chapter: "bai5", q: "1. Nhóm tham khảo (Reference Group) được định nghĩa như thế nào theo Kotler và Keller?", options: ["Tập hợp cá nhân có cùng sở thích mua sắm online.", "Nhóm người cùng thu nhập và địa vị.", "Nhóm có ảnh hưởng trực tiếp hoặc gián tiếp đến thái độ và hành vi của cá nhân.", "Chỉ người thân thiết như gia đình, bạn bè."], correct: [2], multi: false },
+            { chapter: "bai5", q: "2. Những yếu tố nào được coi là 'Bằng chứng xã hội' (Social Proof) trong TMĐT? (Chọn 2 đáp án)", options: ["Tên gọi thương hiệu.", "Điểm đánh giá (ratings) và bình luận.", "Giá niêm yết.", "Số lượng sản phẩm đã bán."], correct: [1, 3], multi: true },
+            { chapter: "bai5", q: "14. Các yếu tố xã hội giúp khách hàng giảm cảm nhận _____ khi không thể kiểm tra trực tiếp hàng hóa.", options: ["Rủi ro", "Chi phí", "Thời gian", "Lo lắng"], correct: [0], multi: false },
+
+            // BÀI 6
+            { chapter: "bai6", q: "1. Nhận thức nhu cầu xảy ra khi nào?", options: ["Khi khách có đủ tiền.", "Sau khi so sánh xong.", "Khi có sự khác biệt giữa trạng thái hiện tại và trạng thái mong muốn.", "Khi nhìn thấy quảng cáo trên tivi."], correct: [2], multi: false },
+            { chapter: "bai6", q: "27. Việc khuyến khích khách hàng để lại _____ và chia sẻ trải nghiệm tích cực là chiến lược quan trọng thu hút khách mới.", options: ["Đánh giá tốt", "Bình luận", "Khiếu nại", "Hình ảnh"], correct: [0], multi: false },
+
+            // BÀI 7
+            { chapter: "bai7", q: "1. Nghiên cứu hành vi người tiêu dùng là quá trình nào?", options: ["Quảng cáo sản phẩm trên mạng xã hội.", "Đơn thuần bán hàng cho khách hiện tại.", "Thu thập, xử lý và phân tích thông tin về nhu cầu, động cơ, thái độ, hành vi để hỗ trợ quyết định marketing.", "Sản xuất hàng hóa dựa trên nguồn lực sẵn có."], correct: [2], multi: false },
+            { chapter: "bai7", q: "29. Nguyên tắc quan trọng nhất khi thiết kế bảng câu hỏi là tránh các câu hỏi _____ vì làm sai lệch kết quả.", options: ["Dẫn dắt", "Mở", "Đóng", "Ngắn"], correct: [0], multi: false },
+
+            // BÀI 8
+            { chapter: "bai8", q: "4. Xu hướng 'Tiêu dùng cá nhân hóa' được hỗ trợ chủ yếu bởi công nghệ nào?", options: ["Trí tuệ nhân tạo (AI) và Big Data", "Kỹ thuật in ấn bao bì", "Cắt giảm chăm sóc khách hàng", "Giao hàng bằng xe máy"], correct: [0], multi: false },
+            { chapter: "bai8", q: "8. Điền từ: Website hoặc ứng dụng có _____ chậm có thể làm giảm trải nghiệm người dùng và khiến họ bỏ đi ngay.", options: ["Tốc độ tải trang", "Giao diện", "Hình ảnh", "Màu sắc"], correct: [0], multi: false },
+
+            // BÀI 9
+            { chapter: "bai9", q: "2. Cá nhân hóa (Personalization) trong marketing được định nghĩa là gì?", options: ["Cắt giảm toàn bộ nhân sự thay bằng AI.", "Khách hàng tự thiết kế sản phẩm.", "Áp dụng một thông điệp chung duy nhất.", "Quá trình điều chỉnh nội dung, sản phẩm hoặc thông điệp phù hợp với đặc điểm và nhu cầu của từng khách hàng."], correct: [3], multi: false },
+            { chapter: "bai9", q: "11. Giá trị vòng đời khách hàng (CLV) đo lường tổng giá trị mà một khách hàng mang lại cho doanh nghiệp trong suốt thời gian họ duy trì mối quan hệ mua hàng. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [0], multi: false }
         ]
     },
     mkt: {
         title: "Chiến Lược & Kế Hoạch Marketing Số",
         chapters: {
-            "bai1": "Bài 1: Tổng quan Chiến lược Marketing Số & Mô hình POEM",
-            "bai2": "Bài 2: Chân dung Khách hàng & Hành trình Khách hàng",
-            "bai3": "Bài 3: Chiến lược Content, Inbound & Outbound Marketing",
-            "bai4": "Bài 4: Sáng tạo Nội dung & Cấu trúc Công thức Copywriting",
-            "bai5": "Bài 5: Digital Marketing Mix (Sản phẩm, Giá, Phân phối, Xúc tiến)",
-            "bai6": "Bài 6: Tư duy Sáng tạo & Sáng tạo Nội dung Số",
-            "bai7": "Bài 7: Kênh & Phương pháp Tiếp cận Khách hàng Trực tuyến",
-            "bai8": "Bài 8: Lập Kế hoạch Marketing Số theo SOSTAC & BSC",
-            "bai9": "Bài 9: Phân tích Dữ liệu Marketing với SPSS"
+            "bai1": "Bài 1: Tổng quan Chiến lược Marketing Số & POEM (29 câu)",
+            "bai2": "Bài 2: Chân dung Khách hàng & Hành trình Khách hàng (30 câu)",
+            "bai3": "Bài 3: Chiến lược Content, Inbound & Outbound (30 câu)",
+            "bai4": "Bài 4: Sáng tạo Nội dung & Cấu trúc Copywriting (27 câu)",
+            "bai5": "Bài 5: Digital Marketing Mix 4P (30 câu)",
+            "bai6": "Bài 6: Tư duy Sáng tạo Nội dung Số (28 câu)",
+            "bai7": "Bài 7: Kênh & Phương pháp Tiếp cận Trực tuyến (30 câu)",
+            "bai8": "Bài 8: Lập Kế hoạch SOSTAC & Thẻ điểm cân bằng BSC (32 câu)",
+            "bai9": "Bài 9: Phân tích Dữ liệu Marketing với SPSS (31 câu)"
         },
         questions: [
-            { chapter: "bai1", q: "Nhóm truyền thông Owned Media bao gồm những kênh nào sau đây? (Chọn 2)", options: ["Email Marketing đối với email khách hàng.", "Đánh giá từ khách hàng trên fanpage.", "Website doanh nghiệp.", "Quảng cáo Google Search."], correct: [0, 2], multi: true },
-            { chapter: "bai1", q: "Ba trụ cột của một chiến lược Marketing số toàn diện được đại diện bởi mô hình nào?", options: ["SMART", "POEM", "AIDA", "4Ps"], correct: [1], multi: false },
-            { chapter: "bai2", q: "Hành trình khách hàng (Customer Journey) được định nghĩa là gì?", options: ["Là bản đồ đường đi từ nhà khách hàng đến cửa hàng.", "Là toàn bộ quá trình một cá nhân tương tác với một thương hiệu từ lúc nhận biết đến khi ủng hộ.", "Là lịch sử các giao dịch chuyển khoản của khách hàng.", "Là danh sách các cuộc gọi mà nhân viên telesales thực hiện."], correct: [1], multi: false },
-            { chapter: "bai3", q: "Chiến lược 'Kéo' (Pull Strategy) trong Marketing số còn có tên gọi phổ biến khác là gì?", options: ["Inbound Marketing", "Mass Marketing", "Outbound Marketing", "Telemarketing"], correct: [0], multi: false },
-            { chapter: "bai4", q: "Chữ 'D' trong mô hình AIDA viết tắt của từ gì?", options: ["Desire (Kích thích mong muốn)", "Data (Dữ liệu)", "Delivery (Giao hàng)", "Design (Thiết kế)"], correct: [0], multi: false }
+            // BÀI 1
+            { chapter: "bai1", q: "1. Kéo thả phương án đúng: Paid Ads thuộc chiến lược nào?", options: ["Đẩy", "Kéo", "Giữ chân", "Hooking"], correct: [0], multi: false },
+            { chapter: "bai1", q: "2. Website có lượng truy cập rất cao nhưng tỷ lệ thoát (Bounce Rate) rất cao. Cần làm gì đầu tiên?", options: ["Thực hiện Digital Audit đo lường hiệu suất tìm nút thắt cổ chai", "Chụp thêm ảnh sản phẩm", "Tăng ngân sách quảng cáo", "Đổi tên thương hiệu"], correct: [0], multi: false },
+            { chapter: "bai1", q: "3. Doanh nghiệp thấy CPC Facebook cao hơn Google nên dồn tiền sang Google. Đây là tư duy gì?", options: ["Tư duy chọn kênh cảm tính", "Tập trung vào ROI (Tỷ suất hoàn vốn)", "Vẽ chân dung kỹ thuật số", "Tư duy Inbound"], correct: [1], multi: false },
+            { chapter: "bai1", q: "4. Nhóm truyền thông Owned Media bao gồm những kênh nào? (Chọn 2 đáp án)", options: ["Email Marketing đối với email khách hàng", "Đánh giá từ khách hàng trên fanpage", "Website doanh nghiệp", "Quảng cáo Google Search"], correct: [0, 2], multi: true },
+            { chapter: "bai1", q: "5. Khách hàng tự nguyện quay video review đăng trang cá nhân. Video thuộc truyền thông nào?", options: ["Paid Media", "Social Media", "Owned Media", "Earned Media"], correct: [3], multi: false },
+            { chapter: "bai1", q: "9. Ba trụ cột của một chiến lược Marketing số toàn diện được đại diện bởi mô hình nào?", options: ["SMART", "POEM", "AIDA", "4Ps"], correct: [1], multi: false },
+            { chapter: "bai1", q: "17. Tắt ngay một mẫu quảng cáo chạy không hiệu quả sau 2 giờ khả thi nhất ở kênh nào?", options: ["Biển quảng cáo sân bay", "Báo giấy", "TVC truyền hình", "Quảng cáo Facebook Ads"], correct: [3], multi: false },
+
+            // BÀI 2
+            { chapter: "bai2", q: "1. Khách hàng cảm thấy 'tự ti ngoại hình khi đi tiệc'. Yếu tố này thuộc phần nào trong chân dung?", options: ["Định dạng nội dung", "Nhân khẩu học", "Thông tin chung", "Khó khăn/Nỗi đau"], correct: [3], multi: false },
+            { chapter: "bai2", q: "5. Để xây dựng chân dung khách hàng dựa trên dữ liệu thực tế hành vi mua sắm cũ, nên khai thác báo cáo từ nền tảng nào?", options: ["TikTok Ads", "CRM", "Google Search", "Canva"], correct: [1], multi: false },
+            { chapter: "bai2", q: "25. Hành trình khách hàng (Customer Journey) được định nghĩa là gì?", options: ["Bản đồ đường đi đến cửa hàng.", "Toàn bộ quá trình một cá nhân tương tác với thương hiệu từ nhận biết đến ủng hộ.", "Lịch sử chuyển khoản.", "Danh sách cuộc gọi telesales."], correct: [1], multi: false },
+
+            // BÀI 3
+            { chapter: "bai3", q: "12. Hai giai đoạn đầu tiên của một chiến dịch Inbound Marketing tiêu biểu là gì?", options: ["Push và Pull", "Attract và Convert", "SEO và Ads", "Close và Delight"], correct: [1], multi: false },
+            { chapter: "bai3", q: "18. Chiến lược 'Kéo' (Pull Strategy) trong Marketing số còn gọi là gì?", options: ["Inbound Marketing", "Mass Marketing", "Outbound Marketing", "Telemarketing"], correct: [0], multi: false },
+
+            // BÀI 4
+            { chapter: "bai4", q: "8. Chữ 'D' trong mô hình AIDA viết tắt của từ gì?", options: ["Desire (Kích thích mong muốn)", "Data", "Delivery", "Design"], correct: [0], multi: false },
+            { chapter: "bai4", q: "26. Công thức 4C bao gồm: Rõ ràng (Clear), Súc tích (Concise), Thuyết phục (Compelling) và...", options: ["Phức tạp (Complex)", "Sáng tạo (Creative)", "Giá rẻ (Cheap)", "Đáng tin (Credible)"], correct: [3], multi: false },
+
+            // BÀI 5
+            { chapter: "bai5", q: "11. Trong mô hình AISAS, chữ 'S' đầu tiên là viết tắt của:", options: ["Sale", "Search", "Share", "Support"], correct: [1], multi: false },
+
+            // BÀI 6
+            { chapter: "bai6", q: "1. Theo mô hình của Teresa Amabile, sự sáng tạo nảy sinh từ sự hợp lưu của 3 thành phần nào?", options: ["Kiến thức, Tư duy sáng tạo, Động lực.", "Kiến thức, Công nghệ, Tiền.", "Kỹ năng viết, đồ họa, chạy Ads.", "Ý tưởng, đối thủ, khách hàng."], correct: [0], multi: false },
+
+            // BÀI 7
+            { chapter: "bai7", q: "17. Nền tảng mạnh về video ngắn dưới 60s, thu hút giới trẻ 15-29 tuổi là:", options: ["TikTok", "Zalo", "Facebook", "LinkedIn"], correct: [0], multi: false },
+
+            // BÀI 8
+            { chapter: "bai8", q: "8. Mục tiêu trong kế hoạch Marketing số cần được xây dựng theo nguyên tắc nào?", options: ["AIDA", "SWOT", "SMART", "POEM"], correct: [2], multi: false },
+            { chapter: "bai8", q: "30. Mô hình lập kế hoạch Marketing số phổ biến và chặt chẽ nhất là:", options: ["AIDA", "4Ps", "SOSTAC", "POEM"], correct: [2], multi: false },
+
+            // BÀI 9
+            { chapter: "bai9", q: "6. Chìa khóa để chấp nhận một giả thuyết nghiên cứu có ý nghĩa thống kê trong SPSS là giá trị Sig. phải:", options: ["≥ 1.0", "> 0.05", "= 1.0", "< 0.05"], correct: [3], multi: false },
+            { chapter: "bai9", q: "18. Hệ số Cronbach's Alpha dùng để đo lường điều gì trong nghiên cứu Marketing?", options: ["Sự khác biệt hai nhóm", "Độ lớn doanh thu", "Mối quan hệ nhân quả", "Độ tin cậy của thang đo (Reliability)"], correct: [3], multi: false }
         ]
     }
 };
@@ -206,7 +304,7 @@ function startQuiz(isReview = false, customList = null) {
     }
     
     if (currentQuestions.length === 0) {
-        alert('Bài này đang cập nhật thêm câu hỏi, vui lòng chọn bài khác!');
+        alert('Phần này chưa có câu hỏi!');
         return;
     }
 
@@ -224,7 +322,7 @@ function startExamSimulator() {
     let shuffled = JSON.parse(JSON.stringify(allQuestions)).sort(() => Math.random() - 0.5);
     currentQuestions = shuffled.slice(0, 50);
     
-    setupQuizScreen("Thi thử hỗn hợp (50 câu)");
+    setupQuizScreen("Thi thử hỗn hợp (50 câu ngẫu nhiên)");
 }
 
 function setupQuizScreen(modeTitle) {
