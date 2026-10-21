@@ -61,7 +61,7 @@
           <i class="ph ph-books text-4xl"></i>
         </div>
         <h2 class="text-2xl md:text-3xl font-extrabold text-slate-800">Chọn Bài Ôn Tập</h2>
-        <p class="text-slate-500 text-sm mt-2">Hệ thống trắc nghiệm tối ưu cho cả máy tính & điện thoại (hỗ trợ trắc nghiệm Đúng/Sai, ghép nối & chọn đáp án tiện lợi).</p>
+        <p class="text-slate-500 text-sm mt-2">Hệ thống trắc nghiệm tối ưu chính xác theo tài liệu gốc.</p>
       </div>
 
       <div class="space-y-6">
@@ -149,7 +149,7 @@
       </div>
     </div>
 
-    <!-- Trang 3: Màn hình Kết quả & Ôn câu sai -->
+    <!-- Trang 3: Màn hình Kết quả -->
     <div id="result-view" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-100 text-center">
       <div class="inline-flex p-4 bg-emerald-50 text-emerald-600 rounded-full mb-4">
         <i class="ph ph-trophy text-5xl"></i>
@@ -232,7 +232,7 @@
       { lesson: 1, type: "SINGLE", text: "Câu 13: Một chiến lược tối ưu hiện nay thường kết hợp cả hai hình thức, được gọi là chiến lược ...", options: ["A. Offline Strategy – Chiến lược Offline.", "B. Blended Strategy – Chiến lược kết hợp.", "C. Traditional Strategy – Chiến lược truyền thống.", "D. Digital First – Kỹ thuật số là trên hết."], correct: [1] },
       { lesson: 1, type: "SINGLE", text: "Câu 14: Đặc điểm giao tiếp chủ đạo của Marketing truyền thống là gì?", options: ["A. Hai chiều.", "B. Đa chiều.", "C. Tương tác tức thì.", "D. Một chiều."], correct: [3] },
       { lesson: 1, type: "MULTIPLE", text: "Câu 15: Những tiêu chí nào cho thấy ưu điểm vượt trội của Marketing số so với truyền thống? (Chọn 2 đáp án đúng)", options: ["A. Khả năng nhắm đối tượng chính xác (Targeted).", "B. Chi phí đầu tư lớn và phải trả trước.", "C. Thông điệp mang tính đại chúng (Massive).", "D. Đo lường được theo thời gian thực (Real-time)."], correct: [0, 3] },
-      { lesson: 1, type: "MATCHING", text: "Câu 16: Ghép tiêu chí đặc điểm với loại hình Marketing phù hợp.", pairs: [{ item: "Ngân sách linh hoạt vài trăm nghìn đồng", match: "Marketing số (thứ 1)" }, { item: "Nhắm đúng sở thích, lịch sử tìm kiếm", match: "Marketing số (thứ 2)" }, { item: "Tiếp cận đại chúng một chiều (TV, Tờ rơi)", match: "Marketing truyền thống" }] },
+      { lesson: 1, type: "MATCHING", text: "Câu 16: Ghép tiêu chí đặc điểm với loại hình Marketing phù hợp.", pairs: [{ item: "Ngân sách linh hoạt vài trăm nghìn đồng", match: "Marketing số" }, { item: "Nhắm đúng sở thích, lịch sử tìm kiếm", match: "Marketing số" }, { item: "Tiếp cận đại chúng một chiều (TV, Tờ rơi)", match: "Marketing truyền thống" }] },
       { lesson: 1, type: "SINGLE", text: "Câu 17: Quản lý Marketing muốn tắt ngay một mẫu quảng cáo đang chạy không hiệu quả sau 2 giờ. Điều này khả thi nhất ở kênh nào?", options: ["A. Biển quảng cáo tại sân bay.", "B. Bài viết PR trên báo giấy.", "C. Quảng cáo truyền hình (TVC).", "D. Quảng cáo Facebook Ads."], correct: [3] },
       { lesson: 1, type: "SINGLE", text: "Câu 18: Bản chất của mô hình 4P trong Marketing truyền thống tập trung vào yếu tố nào để thúc đẩy nhận diện?", options: ["A. Xúc tiến thương mại (Promotion) qua các kênh offline.", "B. Sự tương tác hai chiều với khách hàng.", "C. Phân tích dữ liệu hành vi người dùng theo thời gian thực.", "D. Việc tối ưu hóa thuật toán tìm kiếm."], correct: [0] },
       { lesson: 1, type: "SINGLE", text: "Câu 19: Điền từ phù hợp: \"Khác với sự thụ động của khách hàng trong Marketing truyền thống, trong Marketing số khách hàng có thể tương tác, bình luận và ____ trực tiếp với thương hiệu.\"", options: ["A. Từ chối.", "B. Mua hàng.", "C. Phản đối.", "D. Đánh giá."], correct: [3] },
@@ -436,7 +436,7 @@
 
       // BÀI 8
       { lesson: 8, type: "SINGLE", text: "Câu 1: “Time-to-Market” (thời gian từ ý tưởng đến triển khai) là chỉ số thuộc khía cạnh nào trong BSC?", options: ["A. Tài chính", "B. Khách hàng", "C. Quy trình nội bộ", "D. Học tập và phát triển"], correct: [2] },
-      { lesson: 8, type: "SINGLE", text: "Câu 2: Khía cạnh …. Tập trung đo lường mức độ nhận diện thương hiệu và sự gắn kết của công chú ng trên các nền tảng trực tuyến.", options: ["A. Quy trình nội bộ", "B. Tài chính", "C. Học tập và Phát triển", "D. Khách hàng"], correct: [3] },
+      { lesson: 8, type: "SINGLE", text: "Câu 2: Khía cạnh …. Tập trung đo lường mức độ nhận diện thương hiệu và sự gắn kết của công chúng trên các nền tảng trực tuyến.", options: ["A. Quy trình nội bộ", "B. Tài chính", "C. Học tập và Phát triển", "D. Khách hàng"], correct: [3] },
       { lesson: 8, type: "MULTIPLE", text: "Câu 3: Đâu là các chỉ số thuộc khía cạnh Tài chính trong mô hình BSC? (Chọn 2 đáp án)", options: ["A. Điểm số hài lòng khách hàng (NPS)", "B. Doanh thu trên chi phí quảng cáo (ROAS)", "C. Tốc độ tải trang website", "D. Tỷ suất hoàn vốn đầu tư (ROI)"], correct: [1, 3] },
       { lesson: 8, type: "SINGLE", text: "Câu 4: So sánh chi phí thu hút khách hàng mới (CAC) với giá trị trọn đời (CLV) thuộc khía cạnh nào của BSC?", options: ["A. Quy trình nội bộ", "B. Khách hàng", "C. Tài chính", "D. Học tập và Phát triển"], correct: [2] },
       { lesson: 8, type: "SINGLE", text: "Câu 5: Khắc phục lỗi thanh toán trên website thuộc về khía cạnh nào của BSC?", options: ["A. Quy trình nội bộ", "B. Tài chính", "C. Học tập và Phát triển", "D. Khách hàng"], correct: [0] },
@@ -559,7 +559,7 @@
         'SINGLE': 'Chọn 1 đáp án (A,B,C,D)',
         'MULTIPLE': 'Chọn nhiều đáp án (A,B,C,D)',
         'MATCHING': 'Ghép nối / Kéo thả',
-        'TRUE_FALSE': 'Trắc nghiệm Đúng / Sai'
+        'TRUE_FALSE': 'Đúng / Sai'
       };
       document.getElementById('question-type-badge').innerText = typeMap[q.type] || 'Trắc nghiệm';
       document.getElementById('question-text').innerText = q.text;
@@ -607,7 +607,6 @@
         container.innerHTML = tfHtml;
 
       } else if (q.type === 'MATCHING') {
-        // TẠO THẺ CHO MỖI VẾ CẦN GHÉP (ẨN KHI ĐÃ ĐƯỢC ĐIỀN)
         const currentMatchedState = savedAns || {};
         
         let poolHtml = `<div class="mb-4 p-4 bg-indigo-50/50 rounded-xl border border-indigo-100">
@@ -617,7 +616,6 @@
         let availableCardsCount = 0;
         
         q.pairs.forEach((pair, pairIdx) => {
-          // Kiểm tra xem thẻ tương ứng này đã được sử dụng chưa
           const isUsed = Object.values(currentMatchedState).some(val => val && val.pairIdx === pairIdx);
           
           if (!isUsed) {
@@ -709,7 +707,6 @@
       e.currentTarget.classList.remove('drag-over');
       if (!userAnswers[currentIndex]) userAnswers[currentIndex] = {};
       
-      // Đánh dấu thẻ vào ô slot
       userAnswers[currentIndex][slotIdx] = draggedObj;
       selectedCardObj = null;
       renderQuestion();
@@ -722,7 +719,6 @@
       renderQuestion();
     }
 
-    // Bấm chọn thẻ
     function handleCardClick(pairIdx, text) {
       if (isSubmitted) return;
       if (selectedCardObj && selectedCardObj.pairIdx === pairIdx) {
@@ -733,7 +729,6 @@
       renderQuestion();
     }
 
-    // Bấm thả vào ô
     function handleSlotClick(slotIdx) {
       if (isSubmitted) return;
       if (selectedCardObj) {
