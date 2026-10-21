@@ -26,8 +26,8 @@
 
         .select-group { margin-bottom: 15px; }
         label { font-weight: 600; display: block; margin-bottom: 6px; font-size: 14px; }
-        select, button { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 15px; outline: none; }
-        select { background-color: #fff; cursor: pointer; margin-bottom: 10px; }
+        select, input[type="text"], button { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 15px; outline: none; }
+        select, input[type="text"] { background-color: #fff; margin-bottom: 10px; }
         
         .btn { background-color: var(--primary-color); color: white; border: none; font-weight: 600; cursor: pointer; transition: background-color 0.2s; margin-top: 10px; }
         .btn:hover { background-color: var(--primary-hover); }
@@ -42,7 +42,6 @@
         .question-card { background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
         .question-title { font-weight: 700; font-size: 16px; margin-bottom: 12px; color: #0f172a; }
         
-        /* Cấu trúc cho dạng nhiều tùy chọn / Đúng Sai */
         .option-item { display: flex; align-items: flex-start; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 8px; cursor: pointer; transition: background 0.15s; font-size: 14px; }
         .option-item:hover { background-color: #f1f5f9; }
         .option-item input { margin-top: 3px; margin-right: 12px; }
@@ -52,6 +51,8 @@
         .tf-options { display: flex; gap: 20px; }
         .tf-label { display: flex; align-items: center; cursor: pointer; font-size: 14px; font-weight: 600; }
         .tf-label input { margin-right: 6px; }
+
+        .fill-input { max-width: 300px; display: inline-block; margin-top: 8px; padding: 8px 12px; font-size: 14px; border: 1px solid var(--border-color); border-radius: 6px; }
 
         .feedback { margin-top: 10px; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 600; display: none; }
         .feedback.correct { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; }
@@ -69,7 +70,7 @@
 <div class="container">
     <header>
         <h1>ÔN THI TRẮC NGHIỆM TRỰC TUYẾN - ICTU</h1>
-        <p>Hệ thống ôn tập đầy đủ chuẩn cấu trúc tài liệu Word</p>
+        <p>Hệ thống ôn tập chuẩn xác cấu trúc tài liệu Word (Có điền từ trực tiếp)</p>
     </header>
 
     <div id="selection-screen">
@@ -114,23 +115,21 @@
 </div>
 
 <script>
-// ==================== NGÂN HÀNG CÂU HỎI ĐÚNG CHUẨN FILE WORD ====================
 const quizDatabase = {
     hvtnd: {
         title: "Hành Vi Người Tiêu Dùng",
         chapters: {
-            "bai1": "Bài 1: Tổng quan về Hành vi Người tiêu dùng (30 câu chuẩn)",
-            "bai2": "Bài 2: Phân loại & Chân dung Khách hàng (30 câu)",
-            "bai3": "Bài 3: Yếu tố Nhân khẩu học & Lối sống (30 câu)",
-            "bai4": "Bài 4: Động cơ, Nhận thức, Trí nhớ & Thái độ (29 câu)",
-            "bai5": "Bài 5: Yếu tố Xã hội, Văn hóa & Nhóm tham khảo (31 câu)",
-            "bai6": "Bài 6: Hành trình & Quyết định mua hàng (27 câu)",
-            "bai7": "Bài 7: Nghiên cứu Hành vi Người tiêu dùng (33 câu)",
-            "bai8": "Bài 8: Hành vi Tiêu dùng trong Môi trường Số (35 câu)",
-            "bai9": "Bài 9: Cá nhân hóa & Thông điệp Truyền thông (19 câu)"
+            "bai1": "Bài 1: Tổng quan về Hành vi Người tiêu dùng",
+            "bai2": "Bài 2: Phân loại & Chân dung Khách hàng",
+            "bai3": "Bài 3: Yếu tố Nhân khẩu học & Lối sống",
+            "bai4": "Bài 4: Động cơ, Nhận thức, Trí nhớ & Thái độ",
+            "bai5": "Bài 5: Yếu tố Xã hội, Văn hóa & Nhóm tham khảo",
+            "bai6": "Bài 6: Hành trình & Quyết định mua hàng",
+            "bai7": "Bài 7: Nghiên cứu Hành vi Người tiêu dùng",
+            "bai8": "Bài 8: Hành vi Tiêu dùng trong Môi trường Số",
+            "bai9": "Bài 9: Cá nhân hóa & Thông điệp Truyền thông"
         },
         questions: [
-            // BÀI 1 (Đúng cấu trúc các câu lớn)
             { 
                 chapter: "bai1", 
                 type: "mc",
@@ -169,92 +168,21 @@ const quizDatabase = {
             },
             { 
                 chapter: "bai1", 
-                type: "tf",
-                q: "Câu 5. Xác định nhận định sau về các hoạt động trong quá trình mua sắm là đúng/sai:", 
-                subs: [
-                    { title: "1. Việc lựa chọn phương thức thanh toán là một hoạt động trong giai đoạn 'Trong mua'.", correct: "ĐÚNG" },
-                    { title: "2. Hành vi người tiêu dùng chỉ chịu ảnh hưởng duy nhất bởi nhu cầu cá nhân.", correct: "SAI" },
-                    { title: "3. Quyết định mua hàng không bị tác động bởi các yếu tố tình huống tại điểm bán.", correct: "SAI" },
-                    { title: "4. Động cơ tiêu dùng là một phần của hành vi suy nghĩ bên trong.", correct: "ĐÚNG" }
-                ]
-            },
-            { 
-                chapter: "bai1", 
-                type: "mc",
-                q: "Câu 6. Một sinh viên sử dụng máy tính để học tập, phụ huynh thanh toán tiền mua và cả hai cùng thảo luận lựa chọn sản phẩm. Những nhận định nào sau đây là đúng? (Chọn 2 đáp án)", 
-                options: ["Không có người ra quyết định mua.", "Sinh viên là người sử dụng sản phẩm.", "Sinh viên đồng thời là người mua sản phẩm.", "Phụ huynh là người mua sản phẩm."], 
-                correct: [1, 3] 
-            },
-            { 
-                chapter: "bai1", 
-                type: "mc",
+                type: "fill",
                 q: "Câu 7. Trong ví dụ một gia đình mua tivi, con cái muốn xem phim là người:", 
-                options: ["Đề xuất", "Mua hàng", "Sản xuất", "Thanh toán"], 
-                correct: [0] 
+                answer: "Đề xuất" 
             },
             { 
-                chapter: "bai1", 
-                type: "mc",
-                q: "Câu 8. Nghiên cứu hành vi người tiêu dùng giúp doanh nghiệp thực hiện các hoạt động nào trong chiến lược Marketing? (Chọn 2 đáp án)", 
-                options: ["Tăng lương cho nhân viên sản xuất.", "Quản lý nguồn vốn vay dài hạn.", "Phân đoạn thị trường.", "Định vị thương hiệu."], 
-                correct: [2, 3] 
+                chapter: "bai2", 
+                type: "fill",
+                q: "Câu 13. Điền từ còn thiếu: Chiến lược _____ giúp nhắc nhở khách hàng về đôi giày họ đã bỏ vào giỏ hàng nhưng chưa thanh toán.", 
+                answer: "Remarketing" 
             },
             { 
-                chapter: "bai1", 
-                type: "tf",
-                q: "Câu 9. Xác định những nhận định sau về vai trò của phân tích hành vi khách hàng trong chăm sóc khách hàng là đúng/sai:", 
-                subs: [
-                    { title: "1. Thu hút khách hàng mới quan trọng hơn việc duy trì khách hàng hiện tại.", correct: "SAI" },
-                    { title: "2. Việc xử lý khiếu nại kịp thời không ảnh hưởng đến hình ảnh thương hiệu.", correct: "SAI" },
-                    { title: "3. Hiểu hành vi sau mua giúp cá nhân hóa các chương trình chăm sóc.", correct: "ĐÚNG" },
-                    { title: "4. Starbucks sử dụng dữ liệu thói quen để gửi ưu đãi riêng cho từng khách.", correct: "ĐÚNG" }
-                ]
-            },
-            { 
-                chapter: "bai1", 
-                type: "mc",
-                q: "Câu 10. Việc nghiên cứu hành vi người tiêu dùng hỗ trợ doanh nghiệp phân đoạn thị trường vì: (Chọn 2 đáp án)", 
-                options: ["Giúp bán cùng một sản phẩm cho tất cả khách hàng.", "Giúp loại bỏ hoàn toàn đối thủ cạnh tranh.", "Giúp tập trung nguồn lực vào nhóm khách hàng tiềm năng.", "Giúp nhận diện các nhóm khách hàng có nhu cầu và hành vi tương đồng."], 
-                correct: [2, 3] 
-            },
-            { 
-                chapter: "bai1", 
-                type: "mc",
-                q: "Câu 21. Theo khái niệm hành vi người tiêu dùng, những hoạt động nào thuộc phạm vi nghiên cứu? (Chọn 2 đáp án)", 
-                options: ["Tìm kiếm thông tin về sản phẩm trước khi mua.", "Đánh giá mức độ hài lòng sau khi sử dụng.", "Quản lý nhân sự của doanh nghiệp.", "Sản xuất sản phẩm trong doanh nghiệp."], 
-                correct: [0, 1] 
-            },
-            { 
-                chapter: "bai1", 
-                type: "mc",
-                q: "Câu 22. Chương trình khách hàng thân thiết (Loyalty Program) là ứng dụng của nghiên cứu hành vi trong:", 
-                options: ["Chăm sóc khách hàng.", "Lựa chọn kênh phân phối.", "Định giá sản phẩm.", "Phân đoạn thị trường."], 
-                correct: [0] 
-            },
-            { 
-                chapter: "bai1", 
-                type: "tf",
-                q: "Câu 23. Vai trò của phân tích hành vi trong phát triển sản phẩm:", 
-                subs: [
-                    { title: "1. Doanh nghiệp cải tiến sản phẩm dựa trên phản hồi của khách hàng sau khi sử dụng.", correct: "ĐÚNG" },
-                    { title: "2. Nhu cầu của khách hàng là cố định và không bao giờ thay đổi.", correct: "SAI" },
-                    { title: "3. Nghiên cứu hành vi giúp giảm thiểu rủi ro khi đưa sản phẩm mới ra thị trường.", correct: "ĐÚNG" },
-                    { title: "4. Phát triển sản phẩm chỉ cần quan tâm đến tính năng kỹ thuật.", correct: "SAI" }
-                ]
-            },
-            { 
-                chapter: "bai1", 
-                type: "mc",
-                q: "Câu 25. Trong quy trình nghiên cứu hành vi người tiêu dùng, bước đầu tiên là:", 
-                options: ["Phân tích thị trường và khách hàng.", "Xây dựng chương trình khách hàng thân thiết.", "Triển khai chiến dịch quảng cáo.", "Xây dựng kế hoạch marketing."], 
-                correct: [0] 
-            },
-            { 
-                chapter: "bai1", 
-                type: "mc",
-                q: "Câu 26. Nhiều sản phẩm thất bại trên thị trường dù chất lượng tốt vì:", 
-                options: ["Khách hàng không quan tâm đến sản phẩm mới.", "Thị trường không tồn tại nhu cầu.", "Doanh nghiệp chưa hiểu đúng nhu cầu thực tế của khách hàng.", "Giá bán luôn thấp hơn đối thủ."], 
-                correct: [2] 
+                chapter: "bai3", 
+                type: "fill",
+                q: "Câu 14. Phong cách sống của khách hàng được phân tích thông qua mô hình AIO, bao gồm Activities, Interests và ____.", 
+                answer: "Opinions" 
             }
         ]
     },
@@ -280,22 +208,10 @@ const quizDatabase = {
                 correct: [0, 2] 
             },
             { 
-                chapter: "bai1", 
-                type: "mc",
-                q: "Câu 9. Ba trụ cột của một chiến lược Marketing số toàn diện được đại diện bởi mô hình nào?", 
-                options: ["SMART", "POEM", "AIDA", "4Ps"], 
-                correct: [1] 
-            },
-            { 
-                chapter: "bai1", 
-                type: "tf",
-                q: "Câu 5. Đánh giá nhận định Đúng/Sai trong Marketing số:", 
-                subs: [
-                    { title: "1. Tiêu dùng cá nhân hóa hướng đến việc cung cấp sản phẩm/chương trình phù hợp từng nhóm.", correct: "ĐÚNG" },
-                    { title: "2. AI và Big Data hỗ trợ doanh nghiệp thu thập dữ liệu để cá nhân hóa.", correct: "ĐÚNG" },
-                    { title: "3. Livestream bán hàng giúp tăng tính tương tác giữa người bán và khách hàng.", correct: "ĐÚNG" },
-                    { title: "4. Mua sắm đa kênh là việc doanh nghiệp chỉ tập trung bán hàng trên sàn TMĐT.", correct: "SAI" }
-                ]
+                chapter: "bai4", 
+                type: "fill",
+                q: "Câu 8. Chữ 'D' trong mô hình AIDA viết tắt của từ gì?", 
+                answer: "Desire" 
             }
         ]
     }
@@ -350,7 +266,7 @@ function startQuiz(isReview = false, customList = null) {
     }
     
     if (currentQuestions.length === 0) {
-        alert('Phần này chưa có câu hỏi!');
+        alert('Phần này chưa có câu hỏi hoặc đang cập nhật!');
         return;
     }
 
@@ -415,9 +331,11 @@ function renderQuestions() {
                     </div>
                 `;
             });
+        } else if (qItem.type === 'fill') {
+            html += `<input type="text" class="fill-input" id="fill-${idx}" placeholder="Nhập đáp án của bạn...">`;
         }
         
-        html += `<button class="btn btn-check" onclick="checkSingleQuestion(${idx})">Kiểm tra câu này</button>`;
+        html += `<br><button class="btn btn-check" onclick="checkSingleQuestion(${idx})">Kiểm tra câu này</button>`;
         html += `<div class="feedback" id="feedback-${idx}"></div>`;
         
         card.innerHTML = html;
@@ -475,6 +393,17 @@ function checkSingleQuestion(idx) {
             feedbackDiv.className = 'feedback wrong';
             feedbackDiv.innerHTML = `✖ Bạn trả lời sai ${wrongCount} ý nhỏ. Hãy xem đáp án được tô xanh!`;
         }
+    } else if (qItem.type === 'fill') {
+        const userVal = document.getElementById(`fill-${idx}`).value.trim().toLowerCase();
+        const correctVal = qItem.answer.trim().toLowerCase();
+        
+        if (userVal === correctVal) {
+            feedbackDiv.className = 'feedback correct';
+            feedbackDiv.innerHTML = '✔ Chính xác!';
+        } else {
+            feedbackDiv.className = 'feedback wrong';
+            feedbackDiv.innerHTML = `✖ Chưa chính xác. Đáp án đúng là: "${qItem.answer}"`;
+        }
     }
 }
 
@@ -516,6 +445,9 @@ function submitQuiz() {
                 const selected = document.querySelector(`input[name="tf-${idx}-${subIdx}"]:checked`);
                 if (!selected || selected.value !== sub.correct) isCorrect = false;
             });
+        } else if (qItem.type === 'fill') {
+            const userVal = document.getElementById(`fill-${idx}`).value.trim().toLowerCase();
+            if (userVal !== qItem.answer.trim().toLowerCase()) isCorrect = false;
         }
         
         if (isCorrect) score++;
