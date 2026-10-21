@@ -24,7 +24,7 @@
       touch-action: manipulation;
     }
     .card-selected {
-      ring: 3px;
+      box-shadow: 0 0 0 3px #f59e0b;
       border-color: #f59e0b !important;
       background-color: #fef3c7 !important;
       color: #92400e !important;
@@ -294,8 +294,7 @@
       { lesson: 3, type: "SINGLE", text: "Câu 11: Một người làm ngành xây dựng thường mua thiết bị bảo hộ, công cụ đo đạc. Điều này thể hiện tác động của yếu tố nào?", options: ["A. Nghề nghiệp", "B. Động cơ cảm xúc", "C. Tâm lý cá nhân", "D. Văn hóa xã hội"], correct: [0] },
       { lesson: 3, type: "SINGLE", text: "Câu 12: Phong cách sống (Lifestyle) phản ánh điều gì của khách hàng?", options: ["A. Độ tuổi của khách hàng", "B. Cách khách hàng sống, làm việc và tiêu dùng", "C. Nghề nghiệp của khách hàng", "D. Thu nhập của khách hàng"], correct: [1] },
       { lesson: 3, type: "SINGLE", text: "Câu 13: Nike sử dụng chiến lược “Just Do It” nhằm tác động chủ yếu đến:", options: ["A. Giá sản phẩm", "B. Cá tính và động lực người tiêu dùng", "C. Hệ thống phân phối", "D. Quy trình sản xuất"], correct: [1] },
-      { lesson: 3, type: "FILL_BLANK", text: "Câu 14: Phong cách sống của khách hàng được phân tích thông qua mô hình (1)...., bao gồm Activities, Interests và (2)....", correct 1: ["AIO"],
-correct 2: ["Opinions", "opinions"] },
+      { lesson: 3, type: "FILL_BLANK", text: "Câu 14: Phong cách sống của khách hàng được phân tích thông qua mô hình (1)...., bao gồm Activities, Interests và (2)....", correct: [["AIO"], ["Opinions", "opinions"]] },
       { lesson: 3, type: "MULTIPLE", text: "Câu 15: Trong marketing số, doanh nghiệp có thể làm gì dựa trên dữ liệu hành vi khách hàng? (Chọn 3 đáp án)", options: ["A. Cá nhân hóa nội dung", "B. Remarketing", "C. Quảng cáo nhắm mục tiêu", "D. Tăng giá hàng loạt"], correct: [0, 1, 2] },
       { lesson: 3, type: "TRUE_FALSE", text: "Câu 16: Xác định nhận định sau về tác động của yếu tố địa lý là đúng/sai:", statements: [{ text: "Doanh nghiệp không cần điều chỉnh sản phẩm khi mở rộng ra thị trường quốc tế", correct: "SAI" }, { text: "Người tiêu dùng miền Trung có xu hướng ưu tiên tính bền vững của sản phẩm", correct: "ĐÚNG" }, { text: "Các sàn thương mại điện tử thường tập trung vào nông thôn trước vì dân số đông", correct: "SAI" }, { text: "Khí hậu mùa đông lạnh ở miền Bắc làm tăng nhu cầu về máy sưởi và áo ấm", correct: "ĐÚNG" }] },
       { lesson: 3, type: "MULTIPLE", text: "Câu 17: Một doanh nghiệp bất động sản muốn tiếp cận nhóm khách hàng đang ở giai đoạn lập gia đình. Hai nội dung nào nên được nhấn mạnh trong thông điệp marketing? (Chọn 2)", options: ["A. Chính sách tài chính và hỗ trợ vay mua nhà", "B. Các xu hướng thời trang mới nhất", "C. Không gian sống phù hợp cho gia đình và con cái", "D. Các trò chơi giải trí dành cho thanh thiếu niên"], correct: [0, 2] },
@@ -550,7 +549,7 @@ correct 2: ["Opinions", "opinions"] },
 
       document.getElementById('progress-text').innerText = `Câu ${currentIndex + 1} / ${total}`;
       document.getElementById('question-number-badge').innerText = `Câu ${currentIndex + 1} / ${total}`;
-      const percent = Math.round(((currentIndex + 1) / total) * 100);
+      const percent = Math.round((currentQuestions.filter((question, i) => !isAnswerIncomplete(question, userAnswers[i])).length / total) * 100);
       document.getElementById('progress-percent').innerText = `${percent}%`;
       document.getElementById('progress-bar-fill').style.width = `${percent}%`;
 
@@ -582,13 +581,25 @@ correct 2: ["Opinions", "opinions"] },
           container.appendChild(btn);
         });
       } else if (q.type === 'FILL_BLANK') {
-        const val = savedAns !== undefined ? savedAns : '';
+        const multi = Array.isArray(q.correct[0]);
+        const count = multi ? q.correct.length : 1;
+        const values = multi ? (Array.isArray(savedAns) ? savedAns : []) : [savedAns ?? ''];
         const div = document.createElement('div');
-        div.className = "p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2";
-        div.innerHTML = `
-          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider">Nhập từ/cụm từ còn thiếu vào ô bên dưới:</label>
-          <input type="text" id="blank-input" value="${val}" oninput="handleBlankInput(this.value)" placeholder="Gõ câu trả lời của bạn vào đây..." class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-slate-800 font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-sm" ${isSubmitted ? 'disabled' : ''} />
-        `;
+        div.className = "p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3";
+        const label = document.createElement('label');
+        label.className = "block text-xs font-bold text-slate-600 uppercase";
+        label.textContent = multi ? 'Điền lần lượt các vị trí còn thiếu:' : 'Nhập từ/cụm từ còn thiếu:';
+        div.appendChild(label);
+        for (let i = 0; i < count; i++) {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = values[i] ?? '';
+          input.placeholder = multi ? `Vị trí (${i + 1})` : 'Gõ câu trả lời của bạn...';
+          input.className = "w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-slate-800 font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none";
+          input.disabled = isSubmitted || !!checkedState[currentIndex];
+          input.addEventListener('input', () => handleBlankInput(input.value, i));
+          div.appendChild(input);
+        }
         container.appendChild(div);
 
       } else if (q.type === 'TRUE_FALSE') {
@@ -674,7 +685,7 @@ correct 2: ["Opinions", "opinions"] },
         let correctText = '';
         if (q.type === 'SINGLE') correctText = q.options[q.correct[0]];
         else if (q.type === 'MULTIPLE') correctText = q.correct.map(i => q.options[i]).join('; ');
-        else if (q.type === 'FILL_BLANK') correctText = q.correct[0];
+        else if (q.type === 'FILL_BLANK') correctText = Array.isArray(q.correct[0]) ? q.correct.map((choices, i) => `(${i + 1}) ${choices[0]}`).join(' | ') : q.correct[0];
         else if (q.type === 'MATCHING') correctText = q.pairs.map(p => `${p.item} → ${p.match}`).join(' | ');
         else if (q.type === 'TRUE_FALSE') correctText = q.statements.map((s, i) => `Ý ${i+1}: ${s.correct}`).join(' | ');
 
@@ -689,6 +700,8 @@ correct 2: ["Opinions", "opinions"] },
         expBox.classList.add('hidden');
       }
 
+      document.getElementById('check-btn').disabled = isSubmitted || !!checkedState[currentIndex];
+      document.getElementById('check-btn').classList.toggle('opacity-50', isSubmitted || !!checkedState[currentIndex]);
       document.getElementById('prev-btn').disabled = currentIndex === 0;
       if (currentIndex === total - 1) {
         document.getElementById('next-btn').classList.add('hidden');
@@ -700,9 +713,15 @@ correct 2: ["Opinions", "opinions"] },
     }
 
     // Xử lý điền từ
-    function handleBlankInput(val) {
-      if (isSubmitted) return;
-      userAnswers[currentIndex] = val;
+    function handleBlankInput(val, blankIdx = 0) {
+      if (isSubmitted || checkedState[currentIndex]) return;
+      const q = currentQuestions[currentIndex];
+      if (Array.isArray(q.correct[0])) {
+        if (!Array.isArray(userAnswers[currentIndex])) userAnswers[currentIndex] = [];
+        userAnswers[currentIndex][blankIdx] = val;
+      } else {
+        userAnswers[currentIndex] = val;
+      }
     }
 
     // Drag and Drop & Touch/Click Logic
@@ -724,20 +743,23 @@ correct 2: ["Opinions", "opinions"] },
       e.currentTarget.classList.remove('drag-over');
       if (!userAnswers[currentIndex]) userAnswers[currentIndex] = {};
       
+      if (!draggedObj || isSubmitted || checkedState[currentIndex]) return;
+      Object.keys(userAnswers[currentIndex]).forEach(k => { if (userAnswers[currentIndex][k]?.pairIdx === draggedObj.pairIdx) delete userAnswers[currentIndex][k]; });
       userAnswers[currentIndex][slotIdx] = draggedObj;
+      draggedObj = null;
       selectedCardObj = null;
       renderQuestion();
     }
 
     function handleTrueFalseSelect(sIdx, value) {
-      if (isSubmitted) return;
+      if (isSubmitted || checkedState[currentIndex]) return;
       if (!userAnswers[currentIndex]) userAnswers[currentIndex] = {};
       userAnswers[currentIndex][sIdx] = value;
       renderQuestion();
     }
 
     function handleCardClick(pairIdx, text) {
-      if (isSubmitted) return;
+      if (isSubmitted || checkedState[currentIndex]) return;
       if (selectedCardObj && selectedCardObj.pairIdx === pairIdx) {
         selectedCardObj = null;
       } else {
@@ -747,9 +769,10 @@ correct 2: ["Opinions", "opinions"] },
     }
 
     function handleSlotClick(slotIdx) {
-      if (isSubmitted) return;
+      if (isSubmitted || checkedState[currentIndex]) return;
       if (selectedCardObj) {
         if (!userAnswers[currentIndex]) userAnswers[currentIndex] = {};
+        Object.keys(userAnswers[currentIndex]).forEach(k => { if (userAnswers[currentIndex][k]?.pairIdx === selectedCardObj.pairIdx) delete userAnswers[currentIndex][k]; });
         userAnswers[currentIndex][slotIdx] = selectedCardObj;
         selectedCardObj = null;
         renderQuestion();
@@ -757,7 +780,7 @@ correct 2: ["Opinions", "opinions"] },
     }
 
     function removeMatchingPair(slotIdx) {
-      if (isSubmitted) return;
+      if (isSubmitted || checkedState[currentIndex]) return;
       if (userAnswers[currentIndex] && userAnswers[currentIndex][slotIdx]) {
         delete userAnswers[currentIndex][slotIdx];
         renderQuestion();
@@ -765,7 +788,7 @@ correct 2: ["Opinions", "opinions"] },
     }
 
     function handleOptionSelect(optIdx) {
-      if (isSubmitted) return;
+      if (isSubmitted || checkedState[currentIndex]) return;
       const q = currentQuestions[currentIndex];
 
       if (q.type === 'SINGLE') {
@@ -783,6 +806,7 @@ correct 2: ["Opinions", "opinions"] },
     }
 
     function checkCurrentAnswer() {
+      if (isSubmitted || checkedState[currentIndex]) return;
       checkedState[currentIndex] = true;
       renderQuestion();
     }
@@ -805,13 +829,31 @@ correct 2: ["Opinions", "opinions"] },
         if (ans.length !== q.correct.length) return false;
         return q.correct.every(c => ans.includes(c));
       } else if (q.type === 'FILL_BLANK') {
-        const inputStr = ans.toString().trim().toLowerCase();
-        return q.correct.some(c => c.trim().toLowerCase() === inputStr);
+        const normalize = value => String(value ?? '').trim().replace(/\s+/g, ' ').toLowerCase();
+        if (Array.isArray(q.correct[0])) {
+          return Array.isArray(ans) && q.correct.every((choices, i) =>
+            choices.some(c => normalize(c) === normalize(ans[i])) && normalize(ans[i]) !== ''
+          );
+        }
+        return q.correct.some(c => normalize(c) === normalize(ans) && normalize(ans) !== '');
       } else if (q.type === 'MATCHING') {
         return q.pairs.every((pair, idx) => ans[idx] && ans[idx].text === pair.match);
       } else if (q.type === 'TRUE_FALSE') {
         return q.statements.every((s, idx) => ans[idx] === s.correct);
       }
+      return false;
+    }
+
+    function isAnswerIncomplete(q, ans) {
+      if (ans === undefined || ans === null || ans === '') return true;
+      if (q.type === 'MULTIPLE') return !Array.isArray(ans) || ans.length === 0;
+      if (q.type === 'FILL_BLANK') {
+        return Array.isArray(q.correct[0])
+          ? !Array.isArray(ans) || q.correct.some((_, i) => !String(ans[i] ?? '').trim())
+          : !String(ans).trim();
+      }
+      if (q.type === 'TRUE_FALSE') return q.statements.some((_, i) => !ans[i]);
+      if (q.type === 'MATCHING') return q.pairs.some((_, i) => !ans[i]);
       return false;
     }
 
@@ -823,7 +865,7 @@ correct 2: ["Opinions", "opinions"] },
 
       currentQuestions.forEach((q, idx) => {
         const ans = userAnswers[idx];
-        if (ans === undefined || ans === '' || (q.type === 'MULTIPLE' && ans.length === 0)) {
+        if (isAnswerIncomplete(q, ans)) {
           skippedCount++;
         } else if (checkAnswerCorrect(q, ans)) {
           correctCount++;
@@ -894,7 +936,7 @@ correct 2: ["Opinions", "opinions"] },
               btn.className += "bg-rose-500 text-white border-rose-600";
             }
           } else {
-            if (ans !== undefined && ans !== '' && (q.type !== 'MULTIPLE' || ans.length > 0)) {
+            if (!isAnswerIncomplete(q, ans)) {
               btn.className += "bg-indigo-600 text-white border-indigo-700";
             } else {
               btn.className += "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200";
