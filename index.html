@@ -436,7 +436,7 @@
 
       // BÀI 8
       { lesson: 8, type: "SINGLE", text: "Câu 1: “Time-to-Market” (thời gian từ ý tưởng đến triển khai) là chỉ số thuộc khía cạnh nào trong BSC?", options: ["A. Tài chính", "B. Khách hàng", "C. Quy trình nội bộ", "D. Học tập và phát triển"], correct: [2] },
-      { lesson: 8, type: "SINGLE", text: "Câu 2: Khía cạnh …. Tập trung đo lường mức độ nhận diện thương hiệu và sự gắn kết của công chúng trên các nền tảng trực tuyến.", options: ["A. Quy trình nội bộ", "B. Tài chính", "C. Học tập và Phát triển", "D. Khách hàng"], correct: [3] },
+      { lesson: 8, type: "SINGLE", text: "Câu 2: Khía cạnh …. Tập trung đo lường mức độ nhận diện thương hiệu và sự gắn kết của công chú ng trên các nền tảng trực tuyến.", options: ["A. Quy trình nội bộ", "B. Tài chính", "C. Học tập và Phát triển", "D. Khách hàng"], correct: [3] },
       { lesson: 8, type: "MULTIPLE", text: "Câu 3: Đâu là các chỉ số thuộc khía cạnh Tài chính trong mô hình BSC? (Chọn 2 đáp án)", options: ["A. Điểm số hài lòng khách hàng (NPS)", "B. Doanh thu trên chi phí quảng cáo (ROAS)", "C. Tốc độ tải trang website", "D. Tỷ suất hoàn vốn đầu tư (ROI)"], correct: [1, 3] },
       { lesson: 8, type: "SINGLE", text: "Câu 4: So sánh chi phí thu hút khách hàng mới (CAC) với giá trị trọn đời (CLV) thuộc khía cạnh nào của BSC?", options: ["A. Quy trình nội bộ", "B. Khách hàng", "C. Tài chính", "D. Học tập và Phát triển"], correct: [2] },
       { lesson: 8, type: "SINGLE", text: "Câu 5: Khắc phục lỗi thanh toán trên website thuộc về khía cạnh nào của BSC?", options: ["A. Quy trình nội bộ", "B. Tài chính", "C. Học tập và Phát triển", "D. Khách hàng"], correct: [0] },
@@ -505,7 +505,7 @@
     let userAnswers = {};
     let checkedState = {};
     let isSubmitted = false;
-    let selectedCardText = ''; // Lưu thẻ đang được người dùng bấm chọn
+    let selectedCardText = '';
 
     function shuffleArray(arr) {
       let array = [...arr];
@@ -581,25 +581,22 @@
           container.appendChild(btn);
         });
       } else if (q.type === 'MATCHING') {
-        // Drag and Click Matching
+        // LUÔN HIỂN THỊ ĐẦY ĐỦ TẤT CẢ CÁC THẺ ĐÁP ÁN (DÙ CÓ LẶP LẠI VÀ ĐÃ CHỌN)
         const matchesOptions = Array.from(new Set(q.pairs.map(p => p.match)));
         
         let poolHtml = `<div class="mb-4 p-4 bg-indigo-50/50 rounded-xl border border-indigo-100">
-          <div class="text-xs font-bold text-indigo-800 mb-2 uppercase tracking-wider">Danh sách thẻ đáp án (Bấm chọn hoặc Kéo thả):</div>
+          <div class="text-xs font-bold text-indigo-800 mb-2 uppercase tracking-wider">DANH SÁCH THỂ ĐÁP ÁN (BẤM CHỌN HOẶC KÉO THẢ):</div>
           <div id="drag-pool" class="flex flex-wrap gap-2 min-h-[48px]">`;
         
         matchesOptions.forEach((mOpt) => {
-          const isPlaced = savedAns && Object.values(savedAns).includes(mOpt);
-          if (!isPlaced) {
-            const isSelected = selectedCardText === mOpt;
-            poolHtml += `<div draggable="true" 
-              ondragstart="handleDragStart(event, '${mOpt}')" 
-              onclick="handleCardClick('${mOpt}')" 
-              class="draggable-card px-4 py-2.5 bg-white text-indigo-700 font-semibold text-sm rounded-xl border border-indigo-200 shadow-sm hover:shadow transition flex items-center gap-2 ${isSelected ? 'card-selected' : ''}">
-              <i class="ph ph-hand-tap text-amber-500"></i>
-              <span>${mOpt}</span>
-            </div>`;
-          }
+          const isSelected = selectedCardText === mOpt;
+          poolHtml += `<div draggable="true" 
+            ondragstart="handleDragStart(event, '${mOpt}')" 
+            onclick="handleCardClick('${mOpt}')" 
+            class="draggable-card px-4 py-2.5 bg-white text-indigo-700 font-semibold text-sm rounded-xl border border-indigo-200 shadow-sm hover:shadow transition flex items-center gap-2 ${isSelected ? 'card-selected' : ''}">
+            <i class="ph ph-hand-tap text-amber-500"></i>
+            <span>${mOpt}</span>
+          </div>`;
         });
         poolHtml += `</div></div>`;
 
@@ -619,7 +616,7 @@
         container.innerHTML = poolHtml + slotsHtml;
       }
 
-      // CHỈ HIỂN THỊ ĐÁP ÁN NẾU BẤM "KIỂM TRA ĐÁP ÁN" HOẶC ĐÃ NỘP BÀI
+      // HIỂN THỊ ĐÁP ÁN NẾU BẤM "KIỂM TRA ĐÁP ÁN" HOẶC ĐÃ NỘP BÀI
       const expBox = document.getElementById('explanation-box');
       if (isSubmitted || checkedState[currentIndex]) {
         expBox.classList.remove('hidden');
@@ -670,7 +667,6 @@
       e.currentTarget.classList.remove('drag-over');
       if (!userAnswers[currentIndex]) userAnswers[currentIndex] = {};
       userAnswers[currentIndex][pairIdx] = draggedText;
-      selectedCardText = '';
       renderQuestion();
     }
 
@@ -691,7 +687,6 @@
       if (selectedCardText) {
         if (!userAnswers[currentIndex]) userAnswers[currentIndex] = {};
         userAnswers[currentIndex][pairIdx] = selectedCardText;
-        selectedCardText = ''; // Trả về trạng thái chưa chọn thẻ nào
         renderQuestion();
       }
     }
