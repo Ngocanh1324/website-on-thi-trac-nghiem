@@ -9,9 +9,27 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap');
     body { font-family: 'Lexend', sans-serif; }
+    .drop-zone {
+      min-height: 48px;
+      border: 2px dashed #cbd5e1;
+      transition: all 0.2s ease;
+    }
+    .drop-zone.drag-over {
+      border-color: #4f46e5;
+      background-color: #eef2ff;
+    }
+    .draggable-card {
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+    }
+    .draggable-card:active {
+      cursor: grabbing;
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
   <!-- Header -->
   <header class="bg-indigo-700 text-white shadow-md sticky top-0 z-50">
     <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
@@ -31,17 +49,17 @@
 
   <!-- Main Container -->
   <main id="app-container" class="max-w-4xl mx-auto w-full px-4 py-6 flex-grow">
-    <!-- View 1: Selector / Start Screen -->
+    
+    <!-- Trang 1: Chọn bài & Cấu hình -->
     <div id="start-view" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-100">
       <div class="text-center max-w-2xl mx-auto mb-8">
         <div class="inline-flex p-3 bg-indigo-50 text-indigo-600 rounded-2xl mb-3">
           <i class="ph ph-books text-4xl"></i>
         </div>
         <h2 class="text-2xl md:text-3xl font-extrabold text-slate-800">Chọn Bài Ôn Tập</h2>
-        <p class="text-slate-500 text-sm mt-2">Hệ thống ngân hàng câu hỏi đầy đủ dạng: 1 đáp án, nhiều đáp án, ghép nối, điền từ, đúng/sai.</p>
+        <p class="text-slate-500 text-sm mt-2">Hệ thống ngân hàng câu hỏi chuẩn file Word: 1 đáp án (A,B,C,D), nhiều đáp án, kéo thả thực sự, điền từ.</p>
       </div>
 
-      <!-- Controls & Setup -->
       <div class="space-y-6">
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-2">Chọn bài học:</label>
@@ -59,20 +77,12 @@
           </select>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <label class="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
+        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <label class="flex items-center gap-3 cursor-pointer">
             <input type="checkbox" id="shuffle-toggle" checked class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500">
             <div>
               <div class="font-semibold text-slate-800 text-sm">Trộn thứ tự câu hỏi</div>
-              <p class="text-xs text-slate-500">Trộn ngẫu nhiên danh sách câu hỏi trong phạm vi bài</p>
-            </div>
-          </label>
-
-          <label class="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
-            <input type="checkbox" id="instant-feedback-toggle" checked class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500">
-            <div>
-              <div class="font-semibold text-slate-800 text-sm">Xem đáp án từng câu</div>
-              <p class="text-xs text-slate-500">Hiển thị kết quả đúng/sai ngay khi bấm chuyển câu</p>
+              <p class="text-xs text-slate-500">Trộn ngẫu nhiên các câu hỏi trong phạm vi bài học đã chọn</p>
             </div>
           </label>
         </div>
@@ -83,9 +93,9 @@
       </div>
     </div>
 
-    <!-- View 2: Quiz Play Screen -->
+    <!-- Trang 2: Màn hình Ôn tập từng câu -->
     <div id="quiz-view" class="hidden space-y-6">
-      <!-- Progress Bar -->
+      <!-- Tiến độ -->
       <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
         <div class="flex justify-between items-center text-xs font-semibold text-slate-500 mb-2">
           <span>Tiến độ bài làm</span>
@@ -96,24 +106,21 @@
         </div>
       </div>
 
-      <!-- Question Card -->
+      <!-- Thẻ câu hỏi -->
       <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-100 relative">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
           <span id="question-number-badge" class="font-bold text-indigo-600 text-sm md:text-base">Câu 1</span>
           <span id="question-type-badge" class="bg-amber-100 text-amber-800 text-xs px-2.5 py-1 rounded-md font-medium">Chọn 1 đáp án</span>
         </div>
 
-        <!-- Question Text -->
         <div id="question-text" class="text-slate-800 font-semibold text-base md:text-lg mb-6 leading-relaxed"></div>
+        <div id="options-container" class="space-y-4"></div>
 
-        <!-- Options Container -->
-        <div id="options-container" class="space-y-3"></div>
-
-        <!-- Feedback Box -->
+        <!-- Khung đáp án sau khi bấm Kiểm tra -->
         <div id="explanation-box" class="hidden mt-6 p-4 rounded-xl border"></div>
       </div>
 
-      <!-- Navigation Actions -->
+      <!-- Thanh điều hướng nút bấm -->
       <div class="flex flex-wrap items-center justify-between gap-3">
         <button id="prev-btn" onclick="navigateQuestion(-1)" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-xl text-sm transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed">
           <i class="ph ph-arrow-left"></i> Câu trước
@@ -123,24 +130,28 @@
           <i class="ph ph-grid-four"></i> Danh sách câu
         </button>
 
+        <button onclick="checkCurrentAnswer()" id="check-btn" class="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-sm shadow-md transition flex items-center gap-1.5">
+          <i class="ph ph-check-square"></i> Kiểm tra đáp án
+        </button>
+
         <div class="flex items-center gap-2">
           <button id="next-btn" onclick="navigateQuestion(1)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition flex items-center gap-1.5">
             Tiếp theo <i class="ph ph-arrow-right"></i>
           </button>
           <button id="submit-btn" onclick="submitQuiz()" class="hidden px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm shadow-md transition flex items-center gap-1.5">
-            <i class="ph ph-check-circle"></i> Nộp Bài
+            <i class="ph ph-paper-plane-tilt"></i> Nộp Bài
           </button>
         </div>
       </div>
     </div>
 
-    <!-- View 3: Result Screen -->
+    <!-- Trang 3: Màn hình Kết quả & Ôn câu sai -->
     <div id="result-view" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-100 text-center">
       <div class="inline-flex p-4 bg-emerald-50 text-emerald-600 rounded-full mb-4">
         <i class="ph ph-trophy text-5xl"></i>
       </div>
       <h2 class="text-2xl md:text-3xl font-extrabold text-slate-800 mb-2">Hoàn Thành Bài Tập!</h2>
-      <p class="text-slate-500 text-sm mb-6">Kết quả ôn tập môn Chiến Lược Và Kế Hoạch Marketing Số</p>
+      <p class="text-slate-500 text-sm mb-6">Kết quả tổng hợp bài làm của bạn</p>
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
@@ -157,13 +168,13 @@
         </div>
         <div class="p-4 bg-amber-50 rounded-xl border border-amber-100">
           <span class="block text-2xl font-bold text-amber-600" id="res-skipped">0</span>
-          <span class="text-xs font-semibold text-slate-500">Bỏ trống/Thiếu</span>
+          <span class="text-xs font-semibold text-slate-500">Chọn thiếu / Bỏ trống</span>
         </div>
       </div>
 
       <div class="flex flex-col sm:flex-row gap-3 justify-center">
         <button id="retry-wrong-btn" onclick="startRetryWrong()" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
-          <i class="ph ph-arrow-counter-clockwise text-xl"></i> ÔN LẠI CÁC CÂU LÀM SAI / THIẾU
+          <i class="ph ph-arrow-counter-clockwise text-xl"></i> ÔN LẠI CÁC CÂU LÀM SAI / CHỌN THIẾU
         </button>
         <button onclick="resetToStart()" class="px-6 py-3 bg-slate-700 hover:bg-slate-800 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
           <i class="ph ph-house text-xl"></i> Chọn bài học khác
@@ -200,300 +211,298 @@
   </footer>
 
   <script>
-    // Dữ liệu ngân hàng câu hỏi đầy đủ từ file docx
+    // Dữ liệu ngân hàng câu hỏi đầy đủ chuẩn xác từ file word
     const BANK = [
       // BÀI 1
       { lesson: 1, type: "MATCHING", text: "Câu 1: Hãy kéo thả phương án đúng tương ứng sau đây.", pairs: [{ item: "Paid Ads", match: "Đẩy" }, { item: "SEO/Content", match: "Kéo" }, { item: "Automation/Chatbot", match: "Giữ chân" }] },
-      { lesson: 1, type: "SINGLE", text: "Câu 2: Một website có lượng truy cập rất cao nhưng tỷ lệ thoát (Bounce Rate) cũng rất cao. Chuyên viên Marketing cần làm gì đầu tiên?", options: ["Thực hiện Digital Audit nhằm đo lường hiệu suất để tìm \"nút thắt cổ chai\".", "Chụp thêm ảnh sản phẩm đăng website.", "Tăng ngân sách cho quảng cáo.", "Đổi tên thương hiệu."], correct: [0] },
-      { lesson: 1, type: "SINGLE", text: "Câu 3: Doanh nghiệp nhận thấy quảng cáo Facebook đang có CPC (chi phí mỗi click) quá cao so với Google Ads và quyết định dồn tiền sang Google. Đây là tư duy gì?", options: ["Tư duy chọn kênh theo cảm tính.", "Tập trung vào ROI (Tỷ suất hoàn vốn).", "Vẽ chân dung kỹ thuật số.", "Tư duy Inbound Marketing."], correct: [1] },
-      { lesson: 1, type: "MULTIPLE", text: "Câu 4: Nhóm truyền thông Owned Media bao gồm những kênh nào sau đây? (Chọn 2 đáp án đúng)", options: ["Email Marketing đối với email khách hàng.", "Đánh giá từ khách hàng trên fanpage.", "Website doanh nghiệp.", "Quảng cáo Google Search."], correct: [0, 2] },
-      { lesson: 1, type: "SINGLE", text: "Câu 5: Một khách hàng mua sản phẩm trà và tự nguyện quay video review lên trang cá nhân. Video này thuộc nhóm truyền thông nào của doanh nghiệp?", options: ["Paid Media.", "Social Media.", "Owned Media.", "Earned Media."], correct: [3] },
-      { lesson: 1, type: "SINGLE", text: "Câu 6: Trong mô hình POEM, để tăng độ phủ thương hiệu nhanh chóng nhất cho một chiến dịch ngắn hạn, doanh nghiệp nên ưu tiên sử dụng nhóm truyền thông ____.", options: ["Mixed Media.", "Owned Media.", "Paid Media.", "Earned Media."], correct: [2] },
+      { lesson: 1, type: "SINGLE", text: "Câu 2: Một website có lượng truy cập rất cao nhưng tỷ lệ thoát (Bounce Rate) cũng rất cao. Chuyên viên Marketing cần làm gì đầu tiên?", options: ["A. Thực hiện Digital Audit nhằm đo lường hiệu suất để tìm \"nút thắt cổ chai\".", "B. Chụp thêm ảnh sản phẩm đăng website.", "C. Tăng ngân sách cho quảng cáo.", "D. Đổi tên thương hiệu."], correct: [0] },
+      { lesson: 1, type: "SINGLE", text: "Câu 3: Doanh nghiệp nhận thấy quảng cáo Facebook đang có CPC (chi phí mỗi click) quá cao so với Google Ads và quyết định dồn tiền sang Google. Đây là tư duy gì?", options: ["A. Tư duy chọn kênh theo cảm tính.", "B. Tập trung vào ROI (Tỷ suất hoàn vốn).", "C. Vẽ chân dung kỹ thuật số.", "D. Tư duy Inbound Marketing."], correct: [1] },
+      { lesson: 1, type: "MULTIPLE", text: "Câu 4: Nhóm truyền thông Owned Media bao gồm những kênh nào sau đây? (Chọn 2 đáp án đúng)", options: ["A. Email Marketing đối với email khách hàng.", "B. Đánh giá từ khách hàng trên fanpage.", "C. Website doanh nghiệp.", "D. Quảng cáo Google Search."], correct: [0, 2] },
+      { lesson: 1, type: "SINGLE", text: "Câu 5: Một khách hàng mua sản phẩm trà và tự nguyện quay video review lên trang cá nhân. Video này thuộc nhóm truyền thông nào của doanh nghiệp?", options: ["A. Paid Media.", "B. Social Media.", "C. Owned Media.", "D. Earned Media."], correct: [3] },
+      { lesson: 1, type: "SINGLE", text: "Câu 6: Trong mô hình POEM, để tăng độ phủ thương hiệu nhanh chóng nhất cho một chiến dịch ngắn hạn, doanh nghiệp nên ưu tiên sử dụng nhóm truyền thông ____.", options: ["A. Mixed Media.", "B. Owned Media.", "C. Paid Media.", "D. Earned Media."], correct: [2] },
       { lesson: 1, type: "MATCHING", text: "Câu 7: Hãy ghép nối ví dụ thực tế phù hợp với nhóm truyền thông.", pairs: [{ item: "Báo chí đưa tin tự nguyện", match: "Earned Media" }, { item: "Ứng dụng di động", match: "Owned Media" }, { item: "KOLs Booking", match: "Paid Media" }] },
-      { lesson: 1, type: "SINGLE", text: "Câu 8: Một doanh nghiệp sử dụng Facebook Ads để dẫn khách về landing page của mình. Đây là sự kết hợp giữa hai nhóm truyền thông nào?", options: ["Paid Media và Social Media.", "Owned Media và Earned Media.", "Paid Media và Earned Media.", "Paid Media và Owned Media."], correct: [3] },
-      { lesson: 1, type: "SINGLE", text: "Câu 9: Ba trụ cột của một chiến lược Marketing số toàn diện được đại diện bởi mô hình ____.", options: ["SMART.", "POEM.", "AIDA.", "4Ps."], correct: [1] },
-      { lesson: 1, type: "SINGLE", text: "Câu 10: Khi một bài viết trên blog của doanh nghiệp được cộng đồng chia sẻ rộng rãi mà không mất phí, giá trị lan tỏa đó được gọi là gì?", options: ["Earned Media.", "Owned Media Value.", "Direct Traffic.", "Viral Paid Media."], correct: [0] },
-      { lesson: 1, type: "SINGLE", text: "Câu 11: Việc xác định thông điệp và chiến lược nội dung để thu hút khách hàng trả lời cho câu hỏi ____ trong chiến lược Marketing số.", options: ["Who (Ai – đối tượng).", "Where (Ở đâu).", "How (Làm như thế nào).", "What (Cái gì)."], correct: [3] },
-      { lesson: 1, type: "SINGLE", text: "Câu 12: Doanh nghiệp in sai thông tin trên 10.000 tờ rơi vừa phát. So với Marketing số, vấn đề này thể hiện hạn chế nào của Marketing truyền thống?", options: ["Chi phí đầu tư linh hoạt.", "Khả năng đo lường quá chính xác.", "Tốc độ hiệu chỉnh chậm và tốn kém.", "Đối tượng nhắm chọn quá hẹp."], correct: [2] },
-      { lesson: 1, type: "SINGLE", text: "Câu 13: Một chiến lược tối ưu hiện nay thường kết hợp cả hai hình thức, được gọi là chiến lược ...", options: ["Offline Strategy – Chiến lược Offline.", "Blended Strategy – Chiến lược kết hợp.", "Traditional Strategy – Chiến lược truyền thống.", "Digital First – Kỹ thuật số là trên hết."], correct: [1] },
-      { lesson: 1, type: "SINGLE", text: "Câu 14: Đặc điểm giao tiếp chủ đạo của Marketing truyền thống là gì?", options: ["Hai chiều.", "Đa chiều.", "Tương tác tức thì.", "Một chiều."], correct: [3] },
-      { lesson: 1, type: "MULTIPLE", text: "Câu 15: Những tiêu chí nào cho thấy ưu điểm vượt trội của Marketing số so với truyền thống? (Chọn 2 đáp án đúng)", options: ["Khả năng nhắm đối tượng chính xác (Targeted).", "Chi phí đầu tư lớn và phải trả trước.", "Thông điệp mang tính đại chúng (Massive).", "Đo lường được theo thời gian thực (Real-time)."], correct: [0, 3] },
+      { lesson: 1, type: "SINGLE", text: "Câu 8: Một doanh nghiệp sử dụng Facebook Ads để dẫn khách về landing page của mình. Đây là sự kết hợp giữa hai nhóm truyền thông nào?", options: ["A. Paid Media và Social Media.", "B. Owned Media và Earned Media.", "C. Paid Media và Earned Media.", "D. Paid Media và Owned Media."], correct: [3] },
+      { lesson: 1, type: "SINGLE", text: "Câu 9: Ba trụ cột của một chiến lược Marketing số toàn diện được đại diện bởi mô hình ____.", options: ["A. SMART.", "B. POEM.", "C. AIDA.", "D. 4Ps."], correct: [1] },
+      { lesson: 1, type: "SINGLE", text: "Câu 10: Khi một bài viết trên blog của doanh nghiệp được cộng đồng chia sẻ rộng rãi mà không mất phí, giá trị lan tỏa đó được gọi là gì?", options: ["A. Earned Media.", "B. Owned Media Value.", "C. Direct Traffic.", "D. Viral Paid Media."], correct: [0] },
+      { lesson: 1, type: "SINGLE", text: "Câu 11: Việc xác định thông điệp và chiến lược nội dung để thu hút khách hàng trả lời cho câu hỏi ____ trong chiến lược Marketing số.", options: ["A. Who (Ai – đối tượng).", "B. Where (Ở đâu).", "C. How (Làm như thế nào).", "D. What (Cái gì)."], correct: [3] },
+      { lesson: 1, type: "SINGLE", text: "Câu 12: Doanh nghiệp in sai thông tin trên 10.000 tờ rơi vừa phát. So với Marketing số, vấn đề này thể hiện hạn chế nào của Marketing truyền thống?", options: ["A. Chi phí đầu tư linh hoạt.", "B. Khả năng đo lường quá chính xác.", "C. Tốc độ hiệu chỉnh chậm và tốn kém.", "D. Đối tượng nhắm chọn quá hẹp."], correct: [2] },
+      { lesson: 1, type: "SINGLE", text: "Câu 13: Một chiến lược tối ưu hiện nay thường kết hợp cả hai hình thức, được gọi là chiến lược ...", options: ["A. Offline Strategy – Chiến lược Offline.", "B. Blended Strategy – Chiến lược kết hợp.", "C. Traditional Strategy – Chiến lược truyền thống.", "D. Digital First – Kỹ thuật số là trên hết."], correct: [1] },
+      { lesson: 1, type: "SINGLE", text: "Câu 14: Đặc điểm giao tiếp chủ đạo của Marketing truyền thống là gì?", options: ["A. Hai chiều.", "B. Đa chiều.", "C. Tương tác tức thì.", "D. Một chiều."], correct: [3] },
+      { lesson: 1, type: "MULTIPLE", text: "Câu 15: Những tiêu chí nào cho thấy ưu điểm vượt trội của Marketing số so với truyền thống? (Chọn 2 đáp án đúng)", options: ["A. Khả năng nhắm đối tượng chính xác (Targeted).", "B. Chi phí đầu tư lớn và phải trả trước.", "C. Thông điệp mang tính đại chúng (Massive).", "D. Đo lường được theo thời gian thực (Real-time)."], correct: [0, 3] },
       { lesson: 1, type: "MATCHING", text: "Câu 16: Ghép tiêu chí với loại hình phù hợp.", pairs: [{ item: "Ngân sách linh hoạt vài trăm nghìn đồng", match: "Marketing số (thứ 2)" }, { item: "Nhắm đúng sở thích, lịch sử tìm kiếm", match: "Marketing số (thứ 1)" }, { item: "Tiếp cận đại chúng (TV)", match: "Marketing truyền thống" }] },
-      { lesson: 1, type: "SINGLE", text: "Câu 17: Quản lý Marketing muốn tắt ngay một mẫu quảng cáo đang chạy không hiệu quả sau 2 giờ. Điều này khả thi nhất ở kênh nào?", options: ["Biển quảng cáo tại sân bay.", "Bài viết PR trên báo giấy.", "Quảng cáo truyền hình (TVC).", "Quảng cáo Facebook Ads."], correct: [3] },
-      { lesson: 1, type: "SINGLE", text: "Câu 18: Bản chất của mô hình 4P trong Marketing truyền thống tập trung vào yếu tố nào để thúc đẩy nhận diện?", options: ["Xúc tiến thương mại (Promotion) qua các kênh offline.", "Sự tương tác hai chiều với khách hàng.", "Phân tích dữ liệu hành vi người dùng theo thời gian thực.", "Việc tối ưu hóa thuật toán tìm kiếm."], correct: [0] },
-      { lesson: 1, type: "SINGLE", text: "Câu 19: Điền từ phù hợp: \"Khác với sự thụ động của khách hàng trong Marketing truyền thống, trong Marketing số khách hàng có thể tương tác, bình luận và ____ trực tiếp với thương hiệu.\"", options: ["Từ chối.", "Mua hàng.", "Phản đối.", "Đánh giá."], correct: [3] },
-      { lesson: 1, type: "SINGLE", text: "Câu 20: Tương tác một chiều (One-way communication) là nhược điểm chính của loại hình nào?", options: ["Social Media Marketing.", "Search Engine Marketing.", "Email Marketing.", "Marketing truyền thống."], correct: [3] },
-      { lesson: 1, type: "SINGLE", text: "Câu 21: Chỉ số CPA (Cost Per Action) giúp doanh nghiệp biết rõ chi phí trên mỗi đơn hàng. Đây là ví dụ cho tiêu chí nào?", options: ["Phương thức tiếp cận.", "Đối tượng nhằm tới.", "Tốc độ điều chỉnh.", "Khả năng đo lường."], correct: [3] },
-      { lesson: 1, type: "SINGLE", text: "Câu 22: Ghép mục tiêu với giai đoạn của phễu Marketing.", options: ["Hiển thị – giai đoạn Cân nhắc; Click/Lead – giai đoạn Nhận biết; Doanh số – giai đoạn Chuyển đổi.", "Hiển thị – giai đoạn Nhận biết; Click/Lead – giai đoạn Cân nhắc; Doanh số – giai đoạn Chuyển đổi.", "Hiển thị – giai đoạn Nhận biết; Click/Click – giai đoạn Trung thành; Doanh số – giai đoạn Chuyển đổi.", "Hiển thị – giai đoạn Chuyển đổi; Click/Lead – giai đoạn Nhận biết; Doanh số – giai đoạn Cân nhắc."], correct: [1] },
-      { lesson: 1, type: "SINGLE", text: "Câu 23: Tại sao cần vận hành theo mô hình Omnichannel thay vì phụ thuộc vào 1 kênh?", options: ["Để không phải làm SEO website.", "Để khách hàng thấy quảng cáo ở khắp mọi nơi.", "Để tăng chi phí Marketing nhằm áp đảo đối thủ.", "Để tránh dòng tiền bị đứt gãy khi một tài khoản quảng cáo (như Facebook) bị khóa."], correct: [3] },
-      { lesson: 1, type: "SINGLE", text: "Câu 24: Để hiểu khách hàng thường tìm kiếm từ khóa nào trên Google hay lướt TikTok giờ nào, doanh nghiệp cần ....", options: ["Cài đặt mã theo dõi Pixel.", "Vẽ chân dung kỹ thuật số (Digital Persona).", "Thiết lập KPI.", "Chạy quảng cáo bám đuôi."], correct: [1] },
-      { lesson: 1, type: "SINGLE", text: "Câu 25: Doanh nghiệp chạy song song 2 tiêu đề quảng cáo khác nhau để chọn cái hiệu quả hơn. Kỹ thuật này là gì?", options: ["SEO.", "A/B Testing.", "ReMarketing.", "Truyền thông (Promotion)."], correct: [1] },
-      { lesson: 1, type: "SINGLE", text: "Câu 26: Khách hàng vào website của doanh nghiệp và thấy thông điệp “Cam kết hoàn tiền trong 7 ngày”. Nội dung này phục vụ giai đoạn nào?", options: ["Trung thành", "Chốt đơn (đáy phễu)", "Thuyết phục", "Giáo dục"], correct: [1] },
-      { lesson: 1, type: "SINGLE", text: "Câu 27: Doanh nghiệp tặng Ebook hướng dẫn để đổi lấy Email của khách hàng. Nội dung này thuộc giai đoạn nào của phễu?", options: ["Giữa phễu ( Thuyết phục )", "Sau phễu ( Trung thành )", "Đáy phễu ( Chốt đơn )", "Đầu phễu ( Giáo dục )"], correct: [3] },
-      { lesson: 1, type: "SINGLE", text: "Câu 28: Tại sao Website được coi là nền tảng cốt lõi của Owned Media?", options: ["Vì website có thể tiếp cận đại chúng như tivi", "Vì doanh nghiệp phải trả phí để duy trì hàng tháng", "Vì Website dễ dàng thu hút lượt chia sẻ tự nhiên nhất", "Vì doanh nghiệp toàn quyền kiểm soát và xây dựng tài sản số"], correct: [3] },
-      { lesson: 1, type: "SINGLE", text: "Câu 29: Theo Philip Kotler, bản chất của chiến lược Marketing là gì?", options: ["Hệ thống luận điểm logic làm căn cứ chỉ đạo để giải quyết các nhiệm vụ Marketing", "Việc lựa chọn các kênh truyền thông xã hội phù hợp", "Là các thủ thuật để bán được hành nhanh nhất", "Quy trình thiết kế bao bì và hình ảnh sản phẩm"], correct: [0] },
+      { lesson: 1, type: "SINGLE", text: "Câu 17: Quản lý Marketing muốn tắt ngay một mẫu quảng cáo đang chạy không hiệu quả sau 2 giờ. Điều này khả thi nhất ở kênh nào?", options: ["A. Biển quảng cáo tại sân bay.", "B. Bài viết PR trên báo giấy.", "C. Quảng cáo truyền hình (TVC).", "D. Quảng cáo Facebook Ads."], correct: [3] },
+      { lesson: 1, type: "SINGLE", text: "Câu 18: Bản chất của mô hình 4P trong Marketing truyền thống tập trung vào yếu tố nào để thúc đẩy nhận diện?", options: ["A. Xúc tiến thương mại (Promotion) qua các kênh offline.", "B. Sự tương tác hai chiều với khách hàng.", "C. Phân tích dữ liệu hành vi người dùng theo thời gian thực.", "D. Việc tối ưu hóa thuật toán tìm kiếm."], correct: [0] },
+      { lesson: 1, type: "SINGLE", text: "Câu 19: Điền từ phù hợp: \"Khác với sự thụ động của khách hàng trong Marketing truyền thống, trong Marketing số khách hàng có thể tương tác, bình luận và ____ trực tiếp với thương hiệu.\"", options: ["A. Từ chối.", "B. Mua hàng.", "C. Phản đối.", "D. Đánh giá."], correct: [3] },
+      { lesson: 1, type: "SINGLE", text: "Câu 20: Tương tác một chiều (One-way communication) là nhược điểm chính của loại hình nào?", options: ["A. Social Media Marketing.", "B. Search Engine Marketing.", "C. Email Marketing.", "D. Marketing truyền thống."], correct: [3] },
+      { lesson: 1, type: "SINGLE", text: "Câu 21: Chỉ số CPA (Cost Per Action) giúp doanh nghiệp biết rõ chi phí trên mỗi đơn hàng. Đây là ví dụ cho tiêu chí nào?", options: ["A. Phương thức tiếp cận.", "B. Đối tượng nhằm tới.", "C. Tốc độ điều chỉnh.", "D. Khả năng đo lường."], correct: [3] },
+      { lesson: 1, type: "SINGLE", text: "Câu 22: Ghép mục tiêu với giai đoạn của phễu Marketing.", options: ["A. Hiển thị – Cân nhắc; Click/Lead – Nhận biết; Doanh số – Chuyển đổi.", "B. Hiển thị – Nhận biết; Click/Lead – Cân nhắc; Doanh số – Chuyển đổi.", "C. Hiển thị – Nhận biết; Click – Trung thành; Doanh số – Chuyển đổi.", "D. Hiển thị – Chuyển đổi; Click/Lead – Nhận biết; Doanh số – Cân nhắc."], correct: [1] },
+      { lesson: 1, type: "SINGLE", text: "Câu 23: Tại sao cần vận hành theo mô hình Omnichannel thay vì phụ thuộc vào 1 kênh?", options: ["A. Để không phải làm SEO website.", "B. Để khách hàng thấy quảng cáo ở khắp mọi nơi.", "C. Để tăng chi phí Marketing nhằm áp đảo đối thủ.", "D. Để tránh dòng tiền bị đứt gãy khi một tài khoản quảng cáo (như Facebook) bị khóa."], correct: [3] },
+      { lesson: 1, type: "SINGLE", text: "Câu 24: Để hiểu khách hàng thường tìm kiếm từ khóa nào trên Google hay lướt TikTok giờ nào, doanh nghiệp cần ....", options: ["A. Cài đặt mã theo dõi Pixel.", "B. Vẽ chân dung kỹ thuật số (Digital Persona).", "C. Thiết lập KPI.", "D. Chạy quảng cáo bám đuôi."], correct: [1] },
+      { lesson: 1, type: "SINGLE", text: "Câu 25: Doanh nghiệp chạy song song 2 tiêu đề quảng cáo khác nhau để chọn cái hiệu quả hơn. Kỹ thuật này là gì?", options: ["A. SEO.", "B. A/B Testing.", "C. ReMarketing.", "D. Truyền thông (Promotion)."], correct: [1] },
+      { lesson: 1, type: "SINGLE", text: "Câu 26: Khách hàng vào website của doanh nghiệp và thấy thông điệp “Cam kết hoàn tiền trong 7 ngày”. Nội dung này phục vụ giai đoạn nào?", options: ["A. Trung thành", "B. Chốt đơn (đáy phễu)", "C. Thuyết phục", "D. Giáo dục"], correct: [1] },
+      { lesson: 1, type: "SINGLE", text: "Câu 27: Doanh nghiệp tặng Ebook hướng dẫn để đổi lấy Email của khách hàng. Nội dung này thuộc giai đoạn nào của phễu?", options: ["A. Giữa phễu (Thuyết phục)", "B. Sau phễu (Trung thành)", "C. Đáy phễu (Chốt đơn)", "D. Đầu phễu (Giáo dục)"], correct: [3] },
+      { lesson: 1, type: "SINGLE", text: "Câu 28: Tại sao Website được coi là nền tảng cốt lõi của Owned Media?", options: ["A. Vì website có thể tiếp cận đại chúng như tivi", "B. Vì doanh nghiệp phải trả phí để duy trì hàng tháng", "C. Vì Website dễ dàng thu hút lượt chia sẻ tự nhiên nhất", "D. Vì doanh nghiệp toàn quyền kiểm soát và xây dựng tài sản số"], correct: [3] },
+      { lesson: 1, type: "SINGLE", text: "Câu 29: Theo Philip Kotler, bản chất của chiến lược Marketing là gì?", options: ["A. Hệ thống luận điểm logic làm căn cứ chỉ đạo để giải quyết các nhiệm vụ Marketing", "B. Việc lựa chọn các kênh truyền thông xã hội phù hợp", "C. Là các thủ thuật để bán được hành nhanh nhất", "D. Quy trình thiết kế bao bì và hình ảnh sản phẩm"], correct: [0] },
 
       // BÀI 2
-      { lesson: 2, type: "SINGLE", text: "Câu 1: Một doanh nghiệp thời trang nhận thấy khách hàng mục tiêu thường cảm thấy \"tự ti về ngoại hình khi đi tiệc\". Yếu tố này thuộc phần nào trong chân dung khách hàng?", options: ["Định dạng nội dung", "Nhân khẩu học", "Thông tin chung", "Khó khăn/Nỗi đau"], correct: [3] },
-      { lesson: 2, type: "SINGLE", text: "Câu 2: Việc xác định khách hàng muốn tiếp nhận thông tin qua \"Chữ, hình ảnh, audio hay video\" nhằm mục đích gì?", options: ["Để định giá sản phẩm", "Để tính toán số lượng nhân viên cần thuê.", "Để chọn vị trí đặt cửa hàng vật lý", "Để lựa chọn định dạng nội dung phù hợp cho kế hoạch marketing"], correct: [3] },
-      { lesson: 2, type: "SINGLE", text: "Câu 3: Khách hàng của công ty phần mềm B2B thường tìm giải pháp trên Linkedin thay vì TikTok. Yếu tố này giúp doanh nghiệp xác định đặc điểm nào?", options: ["Nỗi đau khách hàng", "Nhân khẩu học", "Nơi tìm kiếm thông tin", "Thời điểm"], correct: [2] },
-      { lesson: 2, type: "SINGLE", text: "Câu 4: Điền từ phù hợp: \"... là yếu tố giúp doanh nghiệp quyết định nên đặt quảng cáo ở kênh nào (Google, Facebook hay báo chí).\"", options: ["Nơi tìm kiếm thông tin", "Nỗi đau của khách hàng", "Nhân khẩu học", "Thời điểm"], correct: [0] },
-      { lesson: 2, type: "SINGLE", text: "Câu 5: Để xây dựng chân dung khách hàng dựa trên dữ liệu thực tế về hành vi mua sắm cũ, doanh nghiệp nên khai thác báo cáo từ nền tảng nào?", options: ["TikTok Ads", "CRM", "Google Search", "Canva"], correct: [1] },
-      { lesson: 2, type: "SINGLE", text: "Câu 6: Khách hàng đang đọc các bài review trên Google Maps về một nhà hàng. Họ đang ở giai đoạn nào của hành trình?", options: ["Giữ chân", "Quyết định mua", "Cân nhắc", "Nhận biết"], correct: [2] },
-      { lesson: 2, type: "MULTIPLE", text: "Câu 7: Theo bài giảng, nhận thức chọn lọc của con người bao gồm các giai đoạn nào? (Chọn 2 đáp án)", options: ["Sàng lọc", "So sánh", "Chú ý", "Phản biện"], correct: [0, 2] },
-      { lesson: 2, type: "SINGLE", text: "Câu 8: Một người quyết định không mua mỹ phẩm của hãng X vì nghe tin đồn hãng này thử nghiệm trên động vật, dù họ chưa dùng bao giờ. Yếu tố nào ảnh hưởng ở đây?", options: ["Sự hiểu biết và kinh nghiệm", "Nhận thức", "Phong cách sống", "Giá trị và Lòng tin"], correct: [3] },
-      { lesson: 2, type: "MULTIPLE", text: "Câu 9: Đâu là các yếu tố chính để xác định tầng lớp xã hội của một người? (Chọn 2 đáp án)", options: ["Nghề nghiệp", "Vị trí địa lý", "Hành vi", "Giáo dục"], correct: [0, 3] },
-      { lesson: 2, type: "SINGLE", text: "Câu 10: Khi khách hàng có niềm tin sai lệch về sản phẩm gây cản trở việc mua, doanh nghiệp cần thực hiện chiến dịch Marketing để…", options: ["Giảm phá giá sản phẩm", "Thay đổi niềm tin đó", "Tăng cường khuyến mại", "Ngừng bán sản phẩm"], correct: [1] },
-      { lesson: 2, type: "SINGLE", text: "Câu 11: Đâu là một trong 5 điều kiện hoàn cảnh ảnh hưởng đến quá trình quyết định mua của người tiêu dùng?", options: ["Thu nhập cá nhân", "Tôn giáo", "Tầng lớp xã hội", "Mục đích của việc mua sắm"], correct: [3] },
-      { lesson: 2, type: "SINGLE", text: "Câu 12: Điểm chạm (Touchpoints) là bất kỳ thời điểm, vị trí hoặc hình thức giao tiếp nào mà khách hàng tiếp xúc ... với thương hiệu.", options: ["Chỉ qua điện thoại", "Trực tiếp hoặc gián tiếp", "Chỉ khi mua hàng", "Một lần duy nhất"], correct: [1] },
-      { lesson: 2, type: "SINGLE", text: "Câu 13: Mối quan hệ giữa Hành trình khách hàng và Điểm chạm được ví như điều gì?", options: ["Hành trình là người bán, Điểm chạm là người mua.", "Hành trình là bản đồ, Điểm chạm là các cột mốc/trạm dừng chân.", "Hành trình là sản phẩm, Điểm chạm là giá cả.", "Hành trình là website, Điểm chạm là internet."], correct: [1] },
-      { lesson: 2, type: "SINGLE", text: "Câu 14: Việc thấu hiểu bộ đôi hành trình và điểm chạm giúp doanh nghiệp phát hiện các...", options: ["Điểm \"gãy\" trong hành trình", "Mã giảm giá hết hạn", "Nhân viên lười biếng", "Đối thủ mới"], correct: [0] },
-      { lesson: 2, type: "SINGLE", text: "Câu 15: Công cụ dùng để vẽ lại toàn bộ con đường trải nghiệm của người dùng và gắn các điểm chạm tương thích gọi là ....", options: ["Báo cáo doanh thu", "Danh sách khách hàng", "Sơ đồ tổ chức", "Bản đồ hành trình khách hàng"], correct: [3] },
-      { lesson: 2, type: "SINGLE", text: "Câu 16: Khi một bà nội trợ băn khoăn về việc \"làm sao để rửa rau sạch hóa chất”, đây là ví dụ về yếu tố nào trong chân dung khách hàng?", options: ["Vị trí địa lý", "Khó khăn/Nỗi đau", "Nhân khẩu học", "Nghề nghiệp"], correct: [1] },
-      { lesson: 2, type: "SINGLE", text: "Câu 17: Chân dung khách hàng không chỉ là tuổi tác, giới tính mà còn là chìa khóa mở ra các yếu tố tâm lý như... của họ trước quyết định mua.", options: ["Danh sách bạn bè", "Tài khoản ngân hàng", "Mối băn khoăn, mơ ước, khát khao", "Lịch sử du lịch"], correct: [2] },
-      { lesson: 2, type: "SINGLE", text: "Câu 18: Nhóm .......... bao gồm những người mà cá nhân xem như cơ sở để hỏi ý kiến, ảnh hưởng đến tiêu chuẩn đánh giá sản phẩm cao cấp.", options: ["Tham khảo", "Văn hóa", "Lãnh đạo", "Gia đình"], correct: [0] },
-      { lesson: 2, type: "SINGLE", text: "Câu 19: Tại sao nhà Marketing cần quan tâm đến các \"tiểu văn hóa\"?", options: ["Để giảm chi phí quảng cáo xuống mức thấp nhất.", "Để thay đổi hoàn toàn phong tục của khách hàng.", "Để bỏ qua các nhóm khách hàng ít người.", "Để phát hiện các trào lưu tiêu dùng mới và nhóm khách hàng có đặc trưng riêng."], correct: [3] },
-      { lesson: 2, type: "SINGLE", text: "Câu 20: Tại sao quản trị điểm chạm lại giúp tối ưu hóa chi phí đầu tư?", options: ["Vì nó chỉ ra chính xác điểm chạm đang mang lại tỷ lệ chuyển đổi cao nhất để tập trung ngân sách.", "Vì nó giúp doanh nghiệp ngừng trả lương cho nhân viên.", "Vì nó tự động tạo ra quảng cáo miễn phí.", "Vì nó giúp website chạy nhanh hơn mà không tốn tiền."], correct: [0] },
-      { lesson: 2, type: "SINGLE", text: "Câu 21: ... là nhân tố cơ bản nhất quyết định đến ý muốn và hành vi của một người, được truyền từ thế hệ này sang thế hệ khác.", options: ["Văn hóa", "Giá cả", "Công nghệ", "Thời gian"], correct: [0] },
-      { lesson: 2, type: "SINGLE", text: "Câu 22: Giai đoạn ... là khoảnh khắc khách hàng phát hiện ra vấn đề cá nhân hoặc biết đến thương hiệu qua quảng cáo Google/Facebook.", options: ["Quyết định mua", "Nhận biết", "Cân nhắc", "Ủng hộ"], correct: [1] },
-      { lesson: 2, type: "SINGLE", text: "Câu 23: Điểm chạm số tại giai đoạn \"Ủng hộ” thường mang đặc điểm gì?", options: ["Quảng cáo hiển thị thu hút chú ý.", "Bài viết chia sẻ kiến thức giáo dục.", "Tính năng thanh toán bảo mật.", "Khả năng lan tỏa đến cộng đồng xung quanh (chia sẻ, mã giới thiệu)."], correct: [3] },
-      { lesson: 2, type: "SINGLE", text: "Câu 24: Thích xem video ngắn và thường online lúc 21h là đặc điểm ..... trong chân dung khách hàng chiến lược Marketing số.", options: ["Nhân khẩu học và nội dung", "Hành vi và thời điểm", "Định dạng nội dung và thời điểm", "Hành vi và sở thích"], correct: [1] },
-      { lesson: 2, type: "SINGLE", text: "Câu 25: Hành trình khách hàng (Customer Journey) được định nghĩa là gì?", options: ["Là bản đồ đường đi từ nhà khách hàng đến cửa hàng.", "Là toàn bộ quá trình một cá nhân tương tác với một thương hiệu từ lúc nhận biết đến khi ủng hộ.", "Là lịch sử các giao dịch chuyển khoản của khách hàng.", "Là danh sách các cuộc gọi mà nhân viên telesales thực hiện."], correct: [1] },
-      { lesson: 2, type: "SINGLE", text: "Câu 26: Một người chọn mua thực phẩm hữu cơ vì họ coi trọng lối sống xanh và bảo vệ môi trường. Yếu tố nào được thể hiện?", options: ["Sự hiểu biết", "Tầng lớp xã hội", "Hoàn cảnh tiên nghiệm", "Phong cách sống"], correct: [3] },
-      { lesson: 2, type: "SINGLE", text: "Câu 27: Những cá nhân có ảnh hưởng trực tiếp hoặc gián tiếp đến người khác được gọi là gì trong Marketing?", options: ["Người bán lẻ", "Người lãnh đạo có ý kiến ảnh hưởng (Opinion Leaders)", "Người sàng lọc thông tin", "Khách hàng thụ động"], correct: [1] },
-      { lesson: 2, type: "MULTIPLE", text: "Câu 28: Đâu là đặc điểm của hành trình khách hàng trong môi trường số hiện nay? (Chọn 2 đáp án)", options: ["Người dùng chỉ tiếp cận thông tin từ một kênh duy nhất.", "Vận hành như một mạng lưới phức tạp.", "Người dùng chọn lọc thông tin từ nhiều kênh cùng lúc.", "Tuân theo một đường thẳng tuyến tính đơn giản."], correct: [1, 2] },
-      { lesson: 2, type: "SINGLE", text: "Câu 29: Tại sao doanh nghiệp cần biết \"Thời điểm\" khách hàng thường tìm kiếm thông tin?", options: ["Để quyết định ngày ra mắt sản phẩm mới hàng năm.", "Để đăng ký bản quyền thương hiệu.", "Để tính lương cho bộ phận sản xuất.", "Để lên lịch đăng bài và chạy quảng cáo vào khung giờ có tương tác cao nhất."], correct: [3] },
-      { lesson: 2, type: "SINGLE", text: "Câu 30: Giới tính và Tuổi là đặc điểm ..... trong chân dung khách hàng?", options: ["Nhân khẩu học", "Tính cách", "Hành vi", "Nỗi đau/Khó khăn của khách hàng"], correct: [0] },
+      { lesson: 2, type: "SINGLE", text: "Câu 1: Một doanh nghiệp thời trang nhận thấy khách hàng mục tiêu thường cảm thấy \"tự ti về ngoại hình khi đi tiệc\". Yếu tố này thuộc phần nào trong chân dung khách hàng?", options: ["A. Định dạng nội dung", "B. Nhân khẩu học", "C. Thông tin chung", "D. Khó khăn/Nỗi đau"], correct: [3] },
+      { lesson: 2, type: "SINGLE", text: "Câu 2: Việc xác định khách hàng muốn tiếp nhận thông tin qua \"Chữ, hình ảnh, audio hay video\" nhằm mục đích gì?", options: ["A. Để định giá sản phẩm", "B. Để tính toán số lượng nhân viên cần thuê.", "C. Để chọn vị trí đặt cửa hàng vật lý", "D. Để lựa chọn định dạng nội dung phù hợp cho kế hoạch marketing"], correct: [3] },
+      { lesson: 2, type: "SINGLE", text: "Câu 3: Khách hàng của công ty phần mềm B2B thường tìm giải pháp trên Linkedin thay vì TikTok. Yếu tố này giúp doanh nghiệp xác định đặc điểm nào?", options: ["A. Nỗi đau khách hàng", "B. Nhân khẩu học", "C. Nơi tìm kiếm thông tin", "D. Thời điểm"], correct: [2] },
+      { lesson: 2, type: "SINGLE", text: "Câu 4: Điền từ phù hợp: \"... là yếu tố giúp doanh nghiệp quyết định nên đặt quảng cáo ở kênh nào (Google, Facebook hay báo chí).\"", options: ["A. Nơi tìm kiếm thông tin", "B. Nỗi đau của khách hàng", "C. Nhân khẩu học", "D. Thời điểm"], correct: [0] },
+      { lesson: 2, type: "SINGLE", text: "Câu 5: Để xây dựng chân dung khách hàng dựa trên dữ liệu thực tế về hành vi mua sắm cũ, doanh nghiệp nên khai thác báo cáo từ nền tảng nào?", options: ["A. TikTok Ads", "B. CRM", "C. Google Search", "D. Canva"], correct: [1] },
+      { lesson: 2, type: "SINGLE", text: "Câu 6: Khách hàng đang đọc các bài review trên Google Maps về một nhà hàng. Họ đang ở giai đoạn nào của hành trình?", options: ["A. Giữ chân", "B. Quyết định mua", "C. Cân nhắc", "D. Nhận biết"], correct: [2] },
+      { lesson: 2, type: "MULTIPLE", text: "Câu 7: Theo bài giảng, nhận thức chọn lọc của con người bao gồm các giai đoạn nào? (Chọn 2 đáp án)", options: ["A. Sàng lọc", "B. So sánh", "C. Chú ý", "D. Phản biện"], correct: [0, 2] },
+      { lesson: 2, type: "SINGLE", text: "Câu 8: Một người quyết định không mua mỹ phẩm của hãng X vì nghe tin đồn hãng này thử nghiệm trên động vật, dù họ chưa dùng bao giờ. Yếu tố nào ảnh hưởng ở đây?", options: ["A. Sự hiểu biết và kinh nghiệm", "B. Nhận thức", "C. Phong cách sống", "D. Giá trị và Lòng tin"], correct: [3] },
+      { lesson: 2, type: "MULTIPLE", text: "Câu 9: Đâu là các yếu tố chính để xác định tầng lớp xã hội của một người? (Chọn 2 đáp án)", options: ["A. Nghề nghiệp", "B. Vị trí địa lý", "C. Hành vi", "D. Giáo dục"], correct: [0, 3] },
+      { lesson: 2, type: "SINGLE", text: "Câu 10: Khi khách hàng có niềm tin sai lệch về sản phẩm gây cản trở việc mua, doanh nghiệp cần thực hiện chiến dịch Marketing để…", options: ["A. Giảm phá giá sản phẩm", "B. Thay đổi niềm tin đó", "C. Tăng cường khuyến mại", "D. Ngừng bán sản phẩm"], correct: [1] },
+      { lesson: 2, type: "SINGLE", text: "Câu 11: Đâu là một trong 5 điều kiện hoàn cảnh ảnh hưởng đến quá trình quyết định mua của người tiêu dùng?", options: ["A. Thu nhập cá nhân", "B. Tôn giáo", "C. Tầng lớp xã hội", "D. Mục đích của việc mua sắm"], correct: [3] },
+      { lesson: 2, type: "SINGLE", text: "Câu 12: Điểm chạm (Touchpoints) là bất kỳ thời điểm, vị trí hoặc hình thức giao tiếp nào mà khách hàng tiếp xúc ... với thương hiệu.", options: ["A. Chỉ qua điện thoại", "B. Trực tiếp hoặc gián tiếp", "C. Chỉ khi mua hàng", "D. Một lần duy nhất"], correct: [1] },
+      { lesson: 2, type: "SINGLE", text: "Câu 13: Mối quan hệ giữa Hành trình khách hàng và Điểm chạm được ví như điều gì?", options: ["A. Hành trình là người bán, Điểm chạm là người mua.", "B. Hành trình là bản đồ, Điểm chạm là các cột mốc/trạm dừng chân.", "C. Hành trình là sản phẩm, Điểm chạm là giá cả.", "D. Hành trình là website, Điểm chạm là internet."], correct: [1] },
+      { lesson: 2, type: "SINGLE", text: "Câu 14: Việc thấu hiểu bộ đôi hành trình và điểm chạm giúp doanh nghiệp phát hiện các...", options: ["A. Điểm \"gãy\" trong hành trình", "B. Mã giảm giá hết hạn", "C. Nhân viên lười biếng", "D. Đối thủ mới"], correct: [0] },
+      { lesson: 2, type: "SINGLE", text: "Câu 15: Công cụ dùng để vẽ lại toàn bộ con đường trải nghiệm của người dùng và gắn các điểm chạm tương thích gọi là ....", options: ["A. Báo cáo doanh thu", "B. Danh sách khách hàng", "C. Sơ đồ tổ chức", "D. Bản đồ hành trình khách hàng"], correct: [3] },
+      { lesson: 2, type: "SINGLE", text: "Câu 16: Khi một bà nội trợ băn khoăn về việc \"làm sao để rửa rau sạch hóa chất”, đây là ví dụ về yếu tố nào trong chân dung khách hàng?", options: ["A. Vị trí địa lý", "B. Khó khăn/Nỗi đau", "C. Nhân khẩu học", "D. Nghề nghiệp"], correct: [1] },
+      { lesson: 2, type: "SINGLE", text: "Câu 17: Chân dung khách hàng không chỉ là tuổi tác, giới tính mà còn là chìa khóa mở ra các yếu tố tâm lý như... của họ trước quyết định mua.", options: ["A. Danh sách bạn bè", "B. Tài khoản ngân hàng", "C. Mối băn khoăn, mơ ước, khát khao", "D. Lịch sử du lịch"], correct: [2] },
+      { lesson: 2, type: "SINGLE", text: "Câu 18: Nhóm .......... bao gồm những người mà cá nhân xem như cơ sở để hỏi ý kiến, ảnh hưởng đến tiêu chuẩn đánh giá sản phẩm cao cấp.", options: ["A. Tham khảo", "B. Văn hóa", "C. Lãnh đạo", "D. Gia đình"], correct: [0] },
+      { lesson: 2, type: "SINGLE", text: "Câu 19: Tại sao nhà Marketing cần quan tâm đến các \"tiểu văn hóa\"?", options: ["A. Để giảm chi phí quảng cáo xuống mức thấp nhất.", "B. Để thay đổi hoàn toàn phong tục của khách hàng.", "C. Để bỏ qua các nhóm khách hàng ít người.", "D. Để phát hiện các trào lưu tiêu dùng mới và nhóm khách hàng có đặc trưng riêng."], correct: [3] },
+      { lesson: 2, type: "SINGLE", text: "Câu 20: Tại sao quản trị điểm chạm lại giúp tối ưu hóa chi phí đầu tư?", options: ["A. Vì nó chỉ ra chính xác điểm chạm đang mang lại tỷ lệ chuyển đổi cao nhất để tập trung ngân sách.", "B. Vì nó giúp doanh nghiệp ngừng trả lương cho nhân viên.", "C. Vì nó tự động tạo ra quảng cáo miễn phí.", "D. Vì nó giúp website chạy nhanh hơn mà không tốn tiền."], correct: [0] },
+      { lesson: 2, type: "SINGLE", text: "Câu 21: ... là nhân tố cơ bản nhất quyết định đến ý muốn và hành vi của một người, được truyền từ thế hệ này sang thế hệ khác.", options: ["A. Văn hóa", "B. Giá cả", "C. Công nghệ", "D. Thời gian"], correct: [0] },
+      { lesson: 2, type: "SINGLE", text: "Câu 22: Giai đoạn ... là khoảnh khắc khách hàng phát hiện ra vấn đề cá nhân hoặc biết đến thương hiệu qua quảng cáo Google/Facebook.", options: ["A. Quyết định mua", "B. Nhận biết", "C. Cân nhắc", "D. Ủng hộ"], correct: [1] },
+      { lesson: 2, type: "SINGLE", text: "Câu 23: Điểm chạm số tại giai đoạn \"Ủng hộ” thường mang đặc điểm gì?", options: ["A. Quảng cáo hiển thị thu hút chú ý.", "B. Bài viết chia sẻ kiến thức giáo dục.", "C. Tính năng thanh toán bảo mật.", "D. Khả năng lan tỏa đến cộng đồng xung quanh (chia sẻ, mã giới thiệu)."], correct: [3] },
+      { lesson: 2, type: "SINGLE", text: "Câu 24: Thích xem video ngắn và thường online lúc 21h là đặc điểm ..... trong chân dung khách hàng chiến lược Marketing số.", options: ["A. Nhân khẩu học và nội dung", "B. Hành vi và thời điểm", "C. Định dạng nội dung và thời điểm", "D. Hành vi và sở thích"], correct: [1] },
+      { lesson: 2, type: "SINGLE", text: "Câu 25: Hành trình khách hàng (Customer Journey) được định nghĩa là gì?", options: ["A. Là bản đồ đường đi từ nhà khách hàng đến cửa hàng.", "B. Là toàn bộ quá trình một cá nhân tương tác với một thương hiệu từ lúc nhận biết đến khi ủng hộ.", "C. Là lịch sử các giao dịch chuyển khoản của khách hàng.", "D. Là danh sách các cuộc gọi mà nhân viên telesales thực hiện."], correct: [1] },
+      { lesson: 2, type: "SINGLE", text: "Câu 26: Một người chọn mua thực phẩm hữu cơ vì họ coi trọng lối sống xanh và bảo vệ môi trường. Yếu tố nào được thể hiện?", options: ["A. Sự hiểu biết", "B. Tầng lớp xã hội", "C. Hoàn cảnh tiên nghiệm", "D. Phong cách sống"], correct: [3] },
+      { lesson: 2, type: "SINGLE", text: "Câu 27: Những cá nhân có ảnh hưởng trực tiếp hoặc gián tiếp đến người khác được gọi là gì trong Marketing?", options: ["A. Người bán lẻ", "B. Người lãnh đạo có ý kiến ảnh hưởng (Opinion Leaders)", "C. Người sàng lọc thông tin", "D. Khách hàng thụ động"], correct: [1] },
+      { lesson: 2, type: "MULTIPLE", text: "Câu 28: Đâu là đặc điểm của hành trình khách hàng trong môi trường số hiện nay? (Chọn 2 đáp án)", options: ["A. Người dùng chỉ tiếp cận thông tin từ một kênh duy nhất.", "B. Vận hành như một mạng lưới phức tạp.", "C. Người dùng chọn lọc thông tin từ nhiều kênh cùng lúc.", "D. Tuân theo một đường thẳng tuyến tính đơn giản."], correct: [1, 2] },
+      { lesson: 2, type: "SINGLE", text: "Câu 29: Tại sao doanh nghiệp cần biết \"Thời điểm\" khách hàng thường tìm kiếm thông tin?", options: ["A. Để quyết định ngày ra mắt sản phẩm mới hàng năm.", "B. Để đăng ký bản quyền thương hiệu.", "C. Để tính lương cho bộ phận sản xuất.", "D. Để lên lịch đăng bài và chạy quảng cáo vào khung giờ có tương tác cao nhất."], correct: [3] },
+      { lesson: 2, type: "SINGLE", text: "Câu 30: Giới tính và Tuổi là đặc điểm ..... trong chân dung khách hàng?", options: ["A. Nhân khẩu học", "B. Tính cách", "C. Hành vi", "D. Nỗi đau/Khó khăn của khách hàng"], correct: [0] },
 
       // BÀI 3
-      { lesson: 3, type: "SINGLE", text: "Câu 1: Để đạt được mục tiêu dài hạn, doanh nghiệp cần xác định .... ngay từ đầu làm nền tảng cho chiến lược sau này.", options: ["Tầm nhìn trong 3-5 năm", "Tên các influencer nổi tiếng", "Số lượng bài đăng mỗi ngày", "Mức lương cho nhân sự"], correct: [0] },
-      { lesson: 3, type: "MULTIPLE", text: "Câu 2: Tại sao doanh nghiệp cần có chiến lược Content Marketing? (Chọn 2 đáp án)", options: ["Để không cần phải nghiên cứu khách hàng", "Để may rủi quyết định thành công.", "Nhắm đối tượng mục tiêu tốt hơn.", "Tăng hiệu suất nhờ mục đích rõ ràng."], correct: [2, 3] },
-      { lesson: 3, type: "SINGLE", text: "Câu 3: Một startup thực hiện các bài đăng lẻ tẻ, không có mục đích cụ thể và không biết khách hàng mình là ai. Sai lầm lớn nhất ở đây là gì?", options: ["Chưa thuê được nhà sản xuất", "Thiếu ngân sách quảng cáo lớn", "Do nền tảng Facebook bị bão hòa", "Không xây dựng chiến lược content marketing từ đầu"], correct: [3] },
-      { lesson: 3, type: "SINGLE", text: "Câu 4: Chiến lược nội dung là cách thức để định hướng phong cách và .... nhanh chóng, hiệu quả.", options: ["Tăng số lượng từ khóa", "Phát triển thương hiệu", "Thuê ngoài nhân sự", "Giảm chi phí"], correct: [1] },
-      { lesson: 3, type: "SINGLE", text: "Câu 5: Trưởng phòng Marketing yêu cầu đội ngũ phải xác định \"Khán giả của chúng ta đang gặp khó khăn gì?\". Đây là hoạt động phục vụ lợi ích nào?", options: ["Nhắm đối tượng mục tiêu tốt hơn", "Phân bổ ngân sách", "Cải thiện tính nhất quán.", "Tăng tốc độ triển khai"], correct: [0] },
-      { lesson: 3, type: "SINGLE", text: "Câu 6: Bước 1 trong quy trình xây dựng chiến lược nội dung là gì?", options: ["Đo lường kết quả", "Xây dựng chân dung khách hàng", "Lên kế hoạch tổng quát theo mô hình 5W-1H.", "Phân tích tình huống"], correct: [3] },
-      { lesson: 3, type: "MULTIPLE", text: "Câu 7: Hai công cụ phổ biến nhất để đo lường hiệu quả SEO Content Marketing là gì? (Chọn 2 đáp án)", options: ["Google Search Console", "Google Analytics", "Facebook Ads và TikTok Ads.", "Mailchimp"], correct: [0, 1] },
-      { lesson: 3, type: "SINGLE", text: "Câu 8: Điền từ phù hợp: “Cấu trúc cơ bản của nội dung bao gồm: Key Message, Title, Text, .... và Nội dung chi tiết.”", options: ["Image", "Description", "Video", "CTA"], correct: [1] },
-      { lesson: 3, type: "SINGLE", text: "Câu 9: Khi xác định \"Nội dung sẽ xuất hiện trên TikTok hay Facebook\", doanh nghiệp đang trả lời câu hỏi nào trong 5W-1H?", options: ["What", "Where", "Who", "When"], correct: [1] },
-      { lesson: 3, type: "SINGLE", text: "Câu 10: Một thương hiệu mỹ phẩm chọn Ebook hướng dẫn chăm sóc da làm nội dung chính. Đây là loại nội dung phù hợp cho mục tiêu nào?", options: ["Thu hút khách hàng tiềm năng qua điền form.", "Tăng lượt xem video ngắn", "Bán hàng trực tiếp, giảm giá sâu.", "Chào mừng khách hàng cũ quay lại"], correct: [0] },
+      { lesson: 3, type: "SINGLE", text: "Câu 1: Để đạt được mục tiêu dài hạn, doanh nghiệp cần xác định .... ngay từ đầu làm nền tảng cho chiến lược sau này.", options: ["A. Tầm nhìn trong 3-5 năm", "B. Tên các influencer nổi tiếng", "C. Số lượng bài đăng mỗi ngày", "D. Mức lương cho nhân sự"], correct: [0] },
+      { lesson: 3, type: "MULTIPLE", text: "Câu 2: Tại sao doanh nghiệp cần có chiến lược Content Marketing? (Chọn 2 đáp án)", options: ["A. Để không cần phải nghiên cứu khách hàng", "B. Để may rủi quyết định thành công.", "C. Nhắm đối tượng mục tiêu tốt hơn.", "D. Tăng hiệu suất nhờ mục đích rõ ràng."], correct: [2, 3] },
+      { lesson: 3, type: "SINGLE", text: "Câu 3: Một startup thực hiện các bài đăng lẻ tẻ, không có mục đích cụ thể và không biết khách hàng mình là ai. Sai lầm lớn nhất ở đây là gì?", options: ["A. Chưa thuê được nhà sản xuất", "B. Thiếu ngân sách quảng cáo lớn", "C. Do nền tảng Facebook bị bão hòa", "D. Không xây dựng chiến lược content marketing từ đầu"], correct: [3] },
+      { lesson: 3, type: "SINGLE", text: "Câu 4: Chiến lược nội dung là cách thức để định hướng phong cách và .... nhanh chóng, hiệu quả.", options: ["A. Tăng số lượng từ khóa", "B. Phát triển thương hiệu", "C. Thuê ngoài nhân sự", "D. Giảm chi phí"], correct: [1] },
+      { lesson: 3, type: "SINGLE", text: "Câu 5: Trưởng phòng Marketing yêu cầu đội ngũ phải xác định \"Khán giả của chúng ta đang gặp khó khăn gì?\". Đây là hoạt động phục vụ lợi ích nào?", options: ["A. Nhắm đối tượng mục tiêu tốt hơn", "B. Phân bổ ngân sách", "C. Cải thiện tính nhất quán.", "D. Tăng tốc độ triển khai"], correct: [0] },
+      { lesson: 3, type: "SINGLE", text: "Câu 6: Bước 1 trong quy trình xây dựng chiến lược nội dung là gì?", options: ["A. Đo lường kết quả", "B. Xây dựng chân dung khách hàng", "C. Lên kế hoạch tổng quát theo mô hình 5W-1H.", "D. Phân tích tình huống"], correct: [3] },
+      { lesson: 3, type: "MULTIPLE", text: "Câu 7: Hai công cụ phổ biến nhất để đo lường hiệu quả SEO Content Marketing là gì? (Chọn 2 đáp án)", options: ["A. Google Search Console", "B. Google Analytics", "C. Facebook Ads và TikTok Ads.", "D. Mailchimp"], correct: [0, 1] },
+      { lesson: 3, type: "SINGLE", text: "Câu 8: Điền từ phù hợp: “Cấu trúc cơ bản của nội dung bao gồm: Key Message, Title, Text, .... và Nội dung chi tiết.”", options: ["A. Image", "B. Description", "C. Video", "D. CTA"], correct: [1] },
+      { lesson: 3, type: "SINGLE", text: "Câu 9: Khi xác định \"Nội dung sẽ xuất hiện trên TikTok hay Facebook\", doanh nghiệp đang trả lời câu hỏi nào trong 5W-1H?", options: ["A. What", "B. Where", "C. Who", "D. When"], correct: [1] },
+      { lesson: 3, type: "SINGLE", text: "Câu 10: Một thương hiệu mỹ phẩm chọn Ebook hướng dẫn chăm sóc da làm nội dung chính. Đây là loại nội dung phù hợp cho mục tiêu nào?", options: ["A. Thu hút khách hàng tiềm năng qua điền form.", "B. Tăng lượt xem video ngắn", "C. Bán hàng trực tiếp, giảm giá sâu.", "D. Chào mừng khách hàng cũ quay lại"], correct: [0] },
       { lesson: 3, type: "MATCHING", text: "Câu 11: Ghép định dạng nội dung với đặc điểm phù hợp:", pairs: [{ item: "Infographics", match: "Thông tin dạng ảnh" }, { item: "Blogs", match: "Cung cấp thông tin giá trị (1k - 2k từ)" }, { item: "Videos", match: "Thu hút & giáo dục cao" }] },
-      { lesson: 3, type: "SINGLE", text: "Câu 12: Hai giai đoạn đầu tiên của một chiến dịch Inbound Marketing tiêu biểu là gì?", options: ["Push và Pull", "Attract và Convert.", "SEO và Ads", "Close và Delight"], correct: [1] },
-      { lesson: 3, type: "SINGLE", text: "Câu 13: Giai đoạn .... trong chiến dịch Inbound giúp tạo lý do để khách hàng quay lại và coi doanh nghiệp là nơi cung cấp lời khuyên hữu ích.", options: ["Close", "Convert", "Attract", "Delight"], correct: [3] },
-      { lesson: 3, type: "SINGLE", text: "Câu 14: \"Performance Marketing\" thường có mối liên hệ mật thiết và sự phối hợp đa kênh tương đồng với chiến lược nào nhất?", options: ["Chiến lược kéo", "Chiến lược truyền thông", "Chiến lược không quảng cáo", "Chiến lược Đẩy"], correct: [3] },
-      { lesson: 3, type: "SINGLE", text: "Câu 15: Quảng cáo trên TikTok nhắm thẳng vào đám đông và gửi thông điệp tới hàng nghìn người cùng lúc là đặc điểm của chiến lược nào?", options: ["Chiến lược Đẩy", "Chiến lược kéo", "Chiến lược giữ chân", "Chiến lược SEO bền vững"], correct: [0] },
-      { lesson: 3, type: "SINGLE", text: "Câu 16: Khi một nhân viên Marketing thắc mắc \"Tại sao chúng ta phải thực hiện lại chiến dịch này?\", tài liệu nào sẽ cung cấp cơ sở để trả lời?", options: ["Danh sách số điện thoại khách hàng.", "Bản chiến lược Marketing số với các tình huống cụ thể.", "Quy trình sản xuất tại nhà máy.", "Báo cáo thuế của năm trước."], correct: [1] },
-      { lesson: 3, type: "SINGLE", text: "Câu 17: Trong giai đoạn triển khai, doanh nghiệp thông báo cho Influencer về sản phẩm để họ lan truyền. Đây là bước nào?", options: ["Bước 4: Tìm kênh", "Bước 7: Đo lường", "Bước 6: Triển khai chiến lược.", "Bước 2: Phân tích tình huống"], correct: [2] },
-      { lesson: 3, type: "SINGLE", text: "Câu 18: Chiến lược \"Kéo\" (Pull Strategy) trong Marketing số còn có tên gọi phổ biến khác là gì?", options: ["Inbound Marketing.", "Mass Marketing", "Outbound Marketing", "Telemarketing"], correct: [0] },
-      { lesson: 3, type: "SINGLE", text: "Câu 19: Điểm yếu của Inbound Marketing so với Outbound là nhà tiếp thị thường .... đối với việc tạo ra nhận thức tức thì.", options: ["Ít quyền kiểm soát hơn.", "Kiểm soát tuyệt đối", "Tốn nhiều tiền hơn", "Không cần nhân sự"], correct: [0] },
-      { lesson: 3, type: "SINGLE", text: "Câu 20: Để một thương hiệu mang \"dáng hình\" của .... trong ngành, doanh nghiệp nên sử dụng Inbound Marketing.", options: ["Chuyên gia", "Người bán hàng năng động", "Đối thủ", "Người đi vay mượn"], correct: [0] },
-      { lesson: 3, type: "SINGLE", text: "Câu 21: Vai trò của chiến lược Marketing số được ví như điều gì trong hoạt động của doanh nghiệp?", options: ["Một bản danh sách các công nghệ mới nhất.", "Kim chỉ nam chỉ đường cho mọi hành động.", "Một bảng tính toán chi phí nhân sự", "Một công cụ để spam tin nhắn khách hàng"], correct: [1] },
-      { lesson: 3, type: "SINGLE", text: "Câu 22: Nếu không có chiến lược, sự thành công hay thất bại của doanh nghiệp chỉ là do ....", options: ["May rủi", "Dữ liệu", "Công nghệ", "Sự nỗ lực"], correct: [0] },
-      { lesson: 3, type: "SINGLE", text: "Câu 23: Điền từ phù hợp: “Khi có chiến lược hoàn chỉnh, các công việc lập kế hoạch nội dung sẽ ....”", options: ["Trở nên phức tạp hơn", "Hiệu quả và tiết kiệm thời gian", "Mất nhiều thời gian hơn", "Tự động hóa hoàn toàn"], correct: [1] },
-      { lesson: 3, type: "SINGLE", text: "Câu 24: Mục đích chính của việc đặt câu hỏi \"Tại sao bạn cần thực hiện bài viết này?\" trong 5W-1H là gì?", options: ["Xác định ngân sách sản xuất.", "Xác định mục đích", "Xác định đối tượng đọc bài", "Xác định thời điểm đăng bài"], correct: [1] },
+      { lesson: 3, type: "SINGLE", text: "Câu 12: Hai giai đoạn đầu tiên của một chiến dịch Inbound Marketing tiêu biểu là gì?", options: ["A. Push và Pull", "B. Attract và Convert.", "C. SEO và Ads", "D. Close và Delight"], correct: [1] },
+      { lesson: 3, type: "SINGLE", text: "Câu 13: Giai đoạn .... trong chiến dịch Inbound giúp tạo lý do để khách hàng quay lại và coi doanh nghiệp là nơi cung cấp lời khuyên hữu ích.", options: ["A. Close", "B. Convert", "C. Attract", "D. Delight"], correct: [3] },
+      { lesson: 3, type: "SINGLE", text: "Câu 14: \"Performance Marketing\" thường có mối liên hệ mật thiết và sự phối hợp đa kênh tương đồng với chiến lược nào nhất?", options: ["A. Chiến lược kéo", "B. Chiến lược truyền thông", "C. Chiến lược không quảng cáo", "D. Chiến lược Đẩy"], correct: [3] },
+      { lesson: 3, type: "SINGLE", text: "Câu 15: Quảng cáo trên TikTok nhắm thẳng vào đám đông và gửi thông điệp tới hàng nghìn người cùng lúc là đặc điểm của chiến lược nào?", options: ["A. Chiến lược Đẩy", "B. Chiến lược kéo", "C. Chiến lược giữ chân", "D. Chiến lược SEO bền vững"], correct: [0] },
+      { lesson: 3, type: "SINGLE", text: "Câu 16: Khi một nhân viên Marketing thắc mắc \"Tại sao chúng ta phải thực hiện lại chiến dịch này?\", tài liệu nào sẽ cung cấp cơ sở để trả lời?", options: ["A. Danh sách số điện thoại khách hàng.", "B. Bản chiến lược Marketing số với các tình huống cụ thể.", "C. Quy trình sản xuất tại nhà máy.", "D. Báo cáo thuế của năm trước."], correct: [1] },
+      { lesson: 3, type: "SINGLE", text: "Câu 17: Trong giai đoạn triển khai, doanh nghiệp thông báo cho Influencer về sản phẩm để họ lan truyền. Đây là bước nào?", options: ["A. Bước 4: Tìm kênh", "B. Bước 7: Đo lường", "C. Bước 6: Triển khai chiến lược.", "D. Bước 2: Phân tích tình huống"], correct: [2] },
+      { lesson: 3, type: "SINGLE", text: "Câu 18: Chiến lược \"Kéo\" (Pull Strategy) trong Marketing số còn có tên gọi phổ biến khác là gì?", options: ["A. Inbound Marketing.", "B. Mass Marketing", "C. Outbound Marketing", "D. Telemarketing"], correct: [0] },
+      { lesson: 3, type: "SINGLE", text: "Câu 19: Điểm yếu của Inbound Marketing so với Outbound là nhà tiếp thị thường .... đối với việc tạo ra nhận thức tức thì.", options: ["A. Ít quyền kiểm soát hơn.", "B. Kiểm soát tuyệt đối", "C. Tốn nhiều tiền hơn", "D. Không cần nhân sự"], correct: [0] },
+      { lesson: 3, type: "SINGLE", text: "Câu 20: Để một thương hiệu mang \"dáng hình\" của .... trong ngành, doanh nghiệp nên sử dụng Inbound Marketing.", options: ["A. Chuyên gia", "B. Người bán hàng năng động", "C. Đối thủ", "D. Người đi vay mượn"], correct: [0] },
+      { lesson: 3, type: "SINGLE", text: "Câu 21: Vai trò của chiến lược Marketing số được ví như điều gì trong hoạt động của doanh nghiệp?", options: ["A. Một bản danh sách các công nghệ mới nhất.", "B. Kim chỉ nam chỉ đường cho mọi hành động.", "C. Một bảng tính toán chi phí nhân sự", "D. Một công cụ để spam tin nhắn khách hàng"], correct: [1] },
+      { lesson: 3, type: "SINGLE", text: "Câu 22: Nếu không có chiến lược, sự thành công hay thất bại của doanh nghiệp chỉ là do ....", options: ["A. May rủi", "B. Dữ liệu", "C. Công nghệ", "D. Sự nỗ lực"], correct: [0] },
+      { lesson: 3, type: "SINGLE", text: "Câu 23: Điền từ phù hợp: “Khi có chiến lược hoàn chỉnh, các công việc lập kế hoạch nội dung sẽ ....”", options: ["A. Trở nên phức tạp hơn", "B. Hiệu quả và tiết kiệm thời gian", "C. Mất nhiều thời gian hơn", "D. Tự động hóa hoàn toàn"], correct: [1] },
+      { lesson: 3, type: "SINGLE", text: "Câu 24: Mục đích chính của việc đặt câu hỏi \"Tại sao bạn cần thực hiện bài viết này?\" trong 5W-1H là gì?", options: ["A. Xác định ngân sách sản xuất.", "B. Xác định mục đích", "C. Xác định đối tượng đọc bài", "D. Xác định thời điểm đăng bài"], correct: [1] },
       { lesson: 3, type: "MATCHING", text: "Câu 25: Ghép đặc điểm với loại chiến lược phù hợp:", pairs: [{ item: "Khách hàng chủ động tìm kiếm", match: "Inbound Marketing" }, { item: "Doanh nghiệp chủ động gửi thông điệp", match: "Outbound Marketing" }] },
-      { lesson: 3, type: "SINGLE", text: "Câu 26: Điền từ phù hợp: \"Chiến lược ... giúp doanh nghiệp tương thích tốt hơn với những thay đổi của khách hàng và tình huống thực tế.\"", options: ["Trung hạn", "Linh hoạt", "Tổng thể", "Dài hạn"], correct: [1] },
-      { lesson: 3, type: "SINGLE", text: "Câu 27: Để không bị chi phối hay đi sai hướng trong chiến lược, doanh nghiệp cần xác định rõ yếu tố nào tại Bước 2 trong xây dựng chiến lược Marketing số?", options: ["Mức hoa hồng cho cộng tác viên", "Tên phần mềm quản lý CRM", "Cách chạy ads", "Sứ mệnh và mục tiêu chiến dịch."], correct: [3] },
-      { lesson: 3, type: "SINGLE", text: "Câu 28: Doanh nghiệp sử dụng CRM để phân tích dữ liệu khách hàng cũ trước khi liên hệ tư vấn. Đây là một phần của quy trình nào?", options: ["Quy trình vận chuyển hàng", "Quy trình outbound đại trà", "Quy trình Inbound Marketing", "Quy trình thiết kế"], correct: [2] },
-      { lesson: 3, type: "SINGLE", text: "Câu 29: Trong bước phân tích tình huống, việc.... vô cùng quan trọng để làm nổi bật điểm mạnh so với đối thủ.", options: ["Định vị sản phẩm/dịch vụ", "Viết tiêu đề", "Thuê nhân viên", "Mua quảng cáo"], correct: [0] },
-      { lesson: 3, type: "SINGLE", text: "Câu 30: Một khách hàng \"lạ\" ghé thăm website và đánh đổi Email để nhận bộ tài liệu hướng dẫn. Khách hàng này đang chuyển dịch từ giai đoạn nào sang giai đoạn nào?", options: ["Convert sang Close", "Delight sang Attract", "Close sang Delight", "Attract sang Convert"], correct: [3] },
+      { lesson: 3, type: "SINGLE", text: "Câu 26: Điền từ phù hợp: \"Chiến lược ... giúp doanh nghiệp tương thích tốt hơn với những thay đổi của khách hàng và tình huống thực tế.\"", options: ["A. Trung hạn", "B. Linh hoạt", "C. Tổng thể", "D. Dài hạn"], correct: [1] },
+      { lesson: 3, type: "SINGLE", text: "Câu 27: Để không bị chi phối hay đi sai hướng trong chiến lược, doanh nghiệp cần xác định rõ yếu tố nào tại Bước 2 trong xây dựng chiến lược Marketing số?", options: ["A. Mức hoa hồng cho cộng tác viên", "B. Tên phần mềm quản lý CRM", "C. Cách chạy ads", "D. Sứ mệnh và mục tiêu chiến dịch."], correct: [3] },
+      { lesson: 3, type: "SINGLE", text: "Câu 28: Doanh nghiệp sử dụng CRM để phân tích dữ liệu khách hàng cũ trước khi liên hệ tư vấn. Đây là một phần của quy trình nào?", options: ["A. Quy trình vận chuyển hàng", "B. Quy trình outbound đại trà", "C. Quy trình Inbound Marketing", "D. Quy trình thiết kế"], correct: [2] },
+      { lesson: 3, type: "SINGLE", text: "Câu 29: Trong bước phân tích tình huống, việc.... vô cùng quan trọng để làm nổi bật điểm mạnh so với đối thủ.", options: ["A. Định vị sản phẩm/dịch vụ", "B. Viết tiêu đề", "C. Thuê nhân viên", "D. Mua quảng cáo"], correct: [0] },
+      { lesson: 3, type: "SINGLE", text: "Câu 30: Một khách hàng \"lạ\" ghé thăm website và đánh đổi Email để nhận bộ tài liệu hướng dẫn. Khách hàng này đang chuyển dịch từ giai đoạn nào sang giai đoạn nào?", options: ["A. Convert sang Close", "B. Delight sang Attract", "C. Close sang Delight", "D. Attract sang Convert"], correct: [3] },
 
       // BÀI 4
-      { lesson: 4, type: "SINGLE", text: "Câu 1: Content Marketing khác với quảng cáo truyền thống ở điểm nào sau đây?", options: ["Không sử dụng hình ảnh và video", "Tập trung cung cấp nội dung giá trị thay vì quảng cáo lộ liễu sản phẩm", "Có tính quảng cáo trực tiếp và rõ ràng hơn", "Chỉ sử dụng cho bán hàng offline"], correct: [1] },
-      { lesson: 4, type: "SINGLE", text: "Câu 2: Tại sao cần tính \"nhất quán\" trong Content Marketing?", options: ["Khách hàng hiểu đúng thương hiệu", "Đăng nhiều bài", "Tiết kiệm chi phí", "Giảm nhân sự"], correct: [0] },
-      { lesson: 4, type: "SINGLE", text: "Câu 3: Landing page có video giúp gì?", options: ["Giảm thoát trang", "Tăng chia sẻ", "Tăng chuyển đổi", "Giảm chi phí"], correct: [2] },
+      { lesson: 4, type: "SINGLE", text: "Câu 1: Content Marketing khác với quảng cáo truyền thống ở điểm nào sau đây?", options: ["A. Không sử dụng hình ảnh và video", "B. Tập trung cung cấp nội dung giá trị thay vì quảng cáo lộ liễu sản phẩm", "C. Có tính quảng cáo trực tiếp và rõ ràng hơn", "D. Chỉ sử dụng cho bán hàng offline"], correct: [1] },
+      { lesson: 4, type: "SINGLE", text: "Câu 2: Tại sao cần tính \"nhất quán\" trong Content Marketing?", options: ["A. Khách hàng hiểu đúng thương hiệu", "B. Đăng nhiều bài", "C. Tiết kiệm chi phí", "D. Giảm nhân sự"], correct: [0] },
+      { lesson: 4, type: "SINGLE", text: "Câu 3: Landing page có video giúp gì?", options: ["A. Giảm thoát trang", "B. Tăng chia sẻ", "C. Tăng chuyển đổi", "D. Giảm chi phí"], correct: [2] },
       { lesson: 4, type: "MATCHING", text: "Câu 4: Xác định đúng/sai cho các nhận định sau:", pairs: [{ item: "Content Marketing giúp xây dựng mối quan hệ dài hạn", match: "ĐÚNG" }, { item: "Content Marketing cung cấp nội dung giá trị", match: "ĐÚNG" }, { item: "Content Marketing chỉ tập trung quảng cáo bán hàng trực tiếp", match: "SAI" }] },
-      { lesson: 4, type: "SINGLE", text: "Câu 5: trong mô hình 5W-1H, \"Who\" là xác định .... của chiến dịch.", options: ["Đối tượng", "Mục tiêu", "Thời gian", "Nội dung"], correct: [0] },
+      { lesson: 4, type: "SINGLE", text: "Câu 5: Trong mô hình 5W-1H, \"Who\" là xác định .... của chiến dịch.", options: ["A. Đối tượng", "B. Mục tiêu", "C. Thời gian", "D. Nội dung"], correct: [0] },
       { lesson: 4, type: "MATCHING", text: "Câu 6: Ghép định dạng content với mô tả phù hợp:", pairs: [{ item: "Nội dung hình ảnh thu hút thị giác", match: "Image" }, { item: "Nội dung chữ có từ khóa SEO", match: "Article" }, { item: "Nội dung kết hợp âm thanh và hình ảnh", match: "Video" }] },
       { lesson: 4, type: "MATCHING", text: "Câu 7: Ghép loại content với đặc điểm:", pairs: [{ item: "Meme", match: "Dễ lan truyền, hài hước" }, { item: "Infographics", match: "Trực quan hóa dữ liệu" }, { item: "Video Marketing", match: "Tăng khả năng ghi nhớ nội dung" }] },
-      { lesson: 4, type: "SINGLE", text: "Câu 8: Chữ \"D\" trong mô hình AIDA viết tắt của từ gì?", options: ["Desire (Kích thích mong muốn)", "Data (Dữ liệu)", "Delivery (Giao hàng)", "Design (Thiết kế)"], correct: [0] },
-      { lesson: 4, type: "SINGLE", text: "Câu 9: Cấu trúc 4P (Picture – Promise – Prove – Push) thường được dùng hiệu quả nhất cho mục đích gì?", options: ["Viết thông cáo báo chí", "Viết báo cáo tài chính", "Viết quảng cáo bán hàng Facebook", "Viết email nội bộ"], correct: [2] },
-      { lesson: 4, type: "MULTIPLE", text: "Câu 10: Hai cấu trúc nào tập trung mạnh vào việc đưa ra giải pháp cho khách hàng? (Chọn 2 đáp án)", options: ["AIDA", "PAS", "4C", "BAB"], correct: [1, 3] },
+      { lesson: 4, type: "SINGLE", text: "Câu 8: Chữ \"D\" trong mô hình AIDA viết tắt của từ gì?", options: ["A. Desire (Kích thích mong muốn)", "B. Data (Dữ liệu)", "C. Delivery (Giao hàng)", "D. Design (Thiết kế)"], correct: [0] },
+      { lesson: 4, type: "SINGLE", text: "Câu 9: Cấu trúc 4P (Picture – Promise – Prove – Push) thường được dùng hiệu quả nhất cho mục đích gì?", options: ["A. Viết thông cáo báo chí", "B. Viết báo cáo tài chính", "C. Viết quảng cáo bán hàng Facebook", "D. Viết email nội bộ"], correct: [2] },
+      { lesson: 4, type: "MULTIPLE", text: "Câu 10: Hai cấu trúc nào tập trung mạnh vào việc đưa ra giải pháp cho khách hàng? (Chọn 2 đáp án)", options: ["A. AIDA", "B. PAS", "C. 4C", "D. BAB"], correct: [1, 3] },
       { lesson: 4, type: "MATCHING", text: "Câu 11: Trong AIDA: (1) Sử dụng hình ảnh gây chú ý đầu bài. (2) Kêu gọi mua ngay bằng ưu đãi. Nhận định đúng/sai:", pairs: [{ item: "(1) thuộc giai đoạn Attention", match: "ĐÚNG" }, { item: "(2) thuộc giai đoạn Desire", match: "SAI" }] },
       { lesson: 4, type: "MATCHING", text: "Câu 12: Ghép đúng cấu trúc FAB:", pairs: [{ item: "Giúp người dùng tiết kiệm thời gian", match: "Benefit (Lợi ích)" }, { item: "Sản phẩm có pin dung lượng 5000mAh", match: "Feature (Tính năng)" }, { item: "Dùng được lâu hơn so với đối thủ", match: "Advantage (Ưu điểm)" }] },
       { lesson: 4, type: "MATCHING", text: "Câu 13: Ghép đúng yếu tố 4C:", pairs: [{ item: "Credible", match: "Dẫn chứng từ khách hàng thực tế" }, { item: "Concise", match: "Viết ngắn gọn, không lan man" }, { item: "Clear", match: "Bố cục rõ ràng, dễ hiểu" }] },
-      { lesson: 4, type: "MULTIPLE", text: "Câu 14: Một bài viết bị đánh giá dài dòng, lan man, không có điểm nhấn khiến người đọc bỏ qua giữa chừng. Doanh nghiệp cần cải thiện yếu tố nào? (Chọn 2 đáp án)", options: ["Clear", "Credible", "Compelling", "Concise"], correct: [0, 3] },
-      { lesson: 4, type: "MULTIPLE", text: "Câu 15: Quảng cáo gồm: Hình ảnh đẹp + Cam kết hiệu quả + Review thật + Giảm 50% hôm nay. Yếu tố nào thuộc 4P? (Chọn 2 đáp án)", options: ["Promise", "Push", "Picture", "Prove"], correct: [0, 2] },
-      { lesson: 4, type: "SINGLE", text: "Câu 16: Theo Content Marketing Institute, đặc điểm nào sau đây là bắt buộc của một chiến lược Content Marketing?", options: ["Dùng AI phức tạp", "Chỉ đăng mạng xã hội", "Phải tập trung giảm giá sâu", "Nội dung giá trị, nhất quán và phù hợp khách hàng"], correct: [3] },
-      { lesson: 4, type: "MULTIPLE", text: "Câu 17: Content tiện ích có đặc điểm gì? (Chọn 2 đáp án)", options: ["Giúp giải quyết vấn đề thực tế", "Có thể đo qua lượt click hoặc sử dụng", "Chỉ mang tính giải trí", "Không thể đo lường hiệu quả"], correct: [0, 1] },
-      { lesson: 4, type: "MULTIPLE", text: "Câu 18: Bài viết bị đánh giá quá dài dòng, khó hiểu và không đi thẳng vào vấn đề. Cần cải thiện những yếu tố nào trong 4C? (Chọn 2 đáp án)", options: ["Credible", "Concise", "Clear", "Compelling"], correct: [1, 2] },
-      { lesson: 4, type: "MULTIPLE", text: "Câu 19: Bài viết: \"Bạn bị đau dạ dày kéo dài? Tình trạng này khiến bạn mất ngủ, mệt mỏi. Giải pháp X sẽ giúp bạn sau 7 ngày\". Dùng cấu trúc nào? (Chọn 2)", options: ["Problem", "Agitate", "Picture", "Solve"], correct: [0, 1] },
+      { lesson: 4, type: "MULTIPLE", text: "Câu 14: Một bài viết bị đánh giá dài dòng, lan man, không có điểm nhấn khiến người đọc bỏ qua giữa chừng. Doanh nghiệp cần cải thiện yếu tố nào? (Chọn 2 đáp án)", options: ["A. Clear", "B. Credible", "C. Compelling", "D. Concise"], correct: [0, 3] },
+      { lesson: 4, type: "MULTIPLE", text: "Câu 15: Quảng cáo gồm: Hình ảnh đẹp + Cam kết hiệu quả + Review thật + Giảm 50% hôm nay. Yếu tố nào thuộc 4P? (Chọn 2 đáp án)", options: ["A. Promise", "B. Push", "C. Picture", "D. Prove"], correct: [0, 2] },
+      { lesson: 4, type: "SINGLE", text: "Câu 16: Theo Content Marketing Institute, đặc điểm nào sau đây là bắt buộc của một chiến lược Content Marketing?", options: ["A. Dùng AI phức tạp", "B. Chỉ đăng mạng xã hội", "C. Phải tập trung giảm giá sâu", "D. Nội dung giá trị, nhất quán và phù hợp khách hàng"], correct: [3] },
+      { lesson: 4, type: "MULTIPLE", text: "Câu 17: Content tiện ích có đặc điểm gì? (Chọn 2 đáp án)", options: ["A. Giúp giải quyết vấn đề thực tế", "B. Có thể đo qua lượt click hoặc sử dụng", "C. Chỉ mang tính giải trí", "D. Không thể đo lường hiệu quả"], correct: [0, 1] },
+      { lesson: 4, type: "MULTIPLE", text: "Câu 18: Bài viết bị đánh giá quá dài dòng, khó hiểu và không đi thẳng vào vấn đề. Cần cải thiện những yếu tố nào trong 4C? (Chọn 2 đáp án)", options: ["A. Credible", "B. Concise", "C. Clear", "D. Compelling"], correct: [1, 2] },
+      { lesson: 4, type: "MULTIPLE", text: "Câu 19: Bài viết: \"Bạn bị đau dạ dày kéo dài? Tình trạng này khiến bạn mất ngủ, mệt mỏi. Giải pháp X sẽ giúp bạn sau 7 ngày\". Dùng cấu trúc nào? (Chọn 2)", options: ["A. Problem", "B. Agitate", "C. Picture", "D. Solve"], correct: [0, 1] },
       { lesson: 4, type: "MATCHING", text: "Câu 20: Chiến dịch: (1) Đưa hình ảnh sản phẩm đẹp. (2) Đưa đánh giá khách hàng. Đánh giá đúng/sai:", pairs: [{ item: "(1) thuộc Picture", match: "ĐÚNG" }, { item: "(2) thuộc Push", match: "SAI" }] },
-      { lesson: 4, type: "SINGLE", text: "Câu 21: Đặc điểm của Meme GIF là gì?", options: ["Bài viết dài", "Ảnh động hài hước", "Bảng số liệu", "Phim tài liệu"], correct: [1] },
-      { lesson: 4, type: "SINGLE", text: "Câu 22: Tại sao cần tính nhất quán trong Content Marketing?", options: ["Khách hàng hiểu đúng thương hiệu", "Đăng nhiều bài", "Tiết kiệm chi phí", "Giảm nhân sự"], correct: [0] },
+      { lesson: 4, type: "SINGLE", text: "Câu 21: Đặc điểm của Meme GIF là gì?", options: ["A. Bài viết dài", "B. Ảnh động hài hước", "C. Bảng số liệu", "D. Phim tài liệu"], correct: [1] },
+      { lesson: 4, type: "SINGLE", text: "Câu 22: Tại sao cần tính nhất quán trong Content Marketing?", options: ["A. Khách hàng hiểu đúng thương hiệu", "B. Đăng nhiều bài", "C. Tiết kiệm chi phí", "D. Giảm nhân sự"], correct: [0] },
       { lesson: 4, type: "MATCHING", text: "Câu 23: Về Content thông tin, nhận định đúng/sai:", pairs: [{ item: "Luôn mang lại doanh thu ngay trong ngắn hạn", match: "SAI" }, { item: "Cung cấp kiến thức hữu ích hỗ trợ khách hàng", match: "ĐÚNG" }, { item: "Có thể lồng ghép khéo léo thương hiệu vào nội dung", match: "ĐÚNG" }] },
-      { lesson: 4, type: "MULTIPLE", text: "Câu 24: Đặc điểm của Infographics là gì? (Chọn 2 đáp án)", options: ["Không phù hợp Marketing", "Giúp người xem hiểu thông tin phức tạp dễ hơn", "Chỉ dùng cho nội dung giải trí", "Trình bày dữ liệu bằng hình ảnh trực quan"], correct: [1, 3] },
-      { lesson: 4, type: "MULTIPLE", text: "Câu 25: Trong mô hình 5W1H, doanh nghiệp cần xác định những yếu tố nào? (Chọn 2 đáp án)", options: ["What (nội dung)", "Who (đối tượng)", "Profit (lợi nhuận)", "Why (mục đích)"], correct: [0, 1] },
-      { lesson: 4, type: "SINGLE", text: "Câu 26: Công thức 4C bao gồm: Clear, Concise, Compelling và ...", options: ["Complex", "Creative", "Cheap", "Credible"], correct: [3] },
-      { lesson: 4, type: "MULTIPLE", text: "Câu 27: Bài viết: \"Bạn đang mất ngủ kéo dài... Sản phẩm X sẽ giúp bạn\". Cấu trúc gồm các bước nào? (Chọn 2)", options: ["Picture", "Problem", "Promise", "Agitate"], correct: [1, 3] },
+      { lesson: 4, type: "MULTIPLE", text: "Câu 24: Đặc điểm của Infographics là gì? (Chọn 2 đáp án)", options: ["A. Không phù hợp Marketing", "B. Giúp người xem hiểu thông tin phức tạp dễ hơn", "C. Chỉ dùng cho nội dung giải trí", "D. Trình bày dữ liệu bằng hình ảnh trực quan"], correct: [1, 3] },
+      { lesson: 4, type: "MULTIPLE", text: "Câu 25: Trong mô hình 5W1H, doanh nghiệp cần xác định những yếu tố nào? (Chọn 2 đáp án)", options: ["A. What (nội dung)", "B. Who (đối tượng)", "C. Profit (lợi nhuận)", "D. Why (mục đích)"], correct: [0, 1] },
+      { lesson: 4, type: "SINGLE", text: "Câu 26: Công thức 4C bao gồm: Clear, Concise, Compelling và ...", options: ["A. Complex", "B. Creative", "C. Cheap", "D. Credible"], correct: [3] },
+      { lesson: 4, type: "MULTIPLE", text: "Câu 27: Bài viết: \"Bạn đang mất ngủ kéo dài... Sản phẩm X sẽ giúp bạn\". Cấu trúc gồm các bước nào? (Chọn 2)", options: ["A. Picture", "B. Problem", "C. Promise", "D. Agitate"], correct: [1, 3] },
 
       // BÀI 5
-      { lesson: 5, type: "MULTIPLE", text: "Câu 1: Những thành phần nào sau đây được coi là sản phẩm kỹ thuật số? (Chọn 2 đáp án)", options: ["Khóa học trực tuyến (E-learning).", "Máy tính xách tay cấu hình cao", "Xe ô tô điện thông minh.", "Phần mềm và ứng dụng di động."], correct: [0, 3] },
-      { lesson: 5, type: "SINGLE", text: "Câu 2: Trong Digital Marketing, sự thành công của sản phẩm phụ thuộc vào việc liên tục cải tiến dựa trên phản hồi và dữ liệu người dùng thời gian thực. Đúng hay Sai?", options: ["Đúng", "Sai"], correct: [0] },
+      { lesson: 5, type: "MULTIPLE", text: "Câu 1: Những thành phần nào sau đây được coi là sản phẩm kỹ thuật số? (Chọn 2 đáp án)", options: ["A. Khóa học trực tuyến (E-learning).", "B. Máy tính xách tay cấu hình cao", "C. Xe ô tô điện thông minh.", "D. Phần mềm và ứng dụng di động."], correct: [0, 3] },
+      { lesson: 5, type: "SINGLE", text: "Câu 2: Trong Digital Marketing, sự thành công của sản phẩm phụ thuộc vào việc liên tục cải tiến dựa trên phản hồi và dữ liệu người dùng thời gian thực. Đúng hay Sai?", options: ["A. Đúng", "B. Sai"], correct: [0] },
       { lesson: 5, type: "MATCHING", text: "Câu 3: Công ty cung cấp bản miễn phí tính năng cơ bản và bản trả phí nâng cao. Nhận định đúng/sai:", pairs: [{ item: "Đây là ví dụ của giá hớt váng", match: "SAI" }, { item: "Công ty áp dụng mô hình Freemium", match: "ĐÚNG" }, { item: "Mục tiêu là khuyến khích chuyển sang trả phí", match: "ĐÚNG" }] },
       { lesson: 5, type: "MATCHING", text: "Câu 4: Ghép giai đoạn phát triển sản phẩm với hoạt động tương ứng:", pairs: [{ item: "Thương mại hóa", match: "Tung sản phẩm ra thị trường" }, { item: "Tạo ý tưởng", match: "Thu thập và hình thành ý tưởng mới" }, { item: "Kiểm tra thị trường", match: "Thử nghiệm phản ứng của khách hàng" }] },
-      { lesson: 5, type: "SINGLE", text: "Câu 5: Công ty liên tục cập nhật ứng dụng dựa trên dữ liệu tương tác người dùng. Đây là phát triển dựa trên ...", options: ["Phản hồi thời gian thực", "Kinh nghiệm lãnh đạo", "Mô phỏng phòng lab", "Dự báo thời tiết"], correct: [0] },
-      { lesson: 5, type: "SINGLE", text: "Câu 6: Trong kênh phân phối, nhóm nào là thành viên chính thức?", options: ["Công ty vận tải", "Công ty nghiên cứu thị trường", "Nhà sản xuất, nhà bán buôn, nhà bán lẻ, người tiêu dùng cuối cùng", "Ngân hàng, công ty bảo hiểm, kho bãi"], correct: [2] },
-      { lesson: 5, type: "SINGLE", text: "Câu 7: Omnichannel Distribution hướng đến mục tiêu nào?", options: ["Chỉ bán hàng trực tiếp tại cửa hàng", "Tích hợp các kênh online và offline tạo trải nghiệm liền mạch", "Loại bỏ hoàn toàn kênh truyền thống", "Chỉ tập trung vào mạng xã hội"], correct: [1] },
-      { lesson: 5, type: "MULTIPLE", text: "Câu 8: Vai trò của trung gian phân phối là gì? (Chọn 2 đáp án)", options: ["Chỉ thực hiện hoạt động quảng cáo.", "Đưa sản phẩm đến khách hàng đúng thời gian, địa điểm.", "Làm tăng chi phí nên không cần thiết.", "Điều hòa cung cầu trên thị trường."], correct: [1, 3] },
-      { lesson: 5, type: "MULTIPLE", text: "Câu 9: Chiến lược Omnichannel hiệu quả thường yêu cầu: (Chọn 2 đáp án)", options: ["Kết nối dữ liệu giữa các kênh bán hàng.", "Đồng bộ thông tin tồn kho trên nhiều kênh.", "Tách biệt hoàn toàn kênh online và offline.", "Chỉ sử dụng một kênh bán hàng duy nhất."], correct: [0, 1] },
+      { lesson: 5, type: "SINGLE", text: "Câu 5: Công ty liên tục cập nhật ứng dụng dựa trên dữ liệu tương tác người dùng. Đây là phát triển dựa trên ...", options: ["A. Phản hồi thời gian thực", "B. Kinh nghiệm lãnh đạo", "C. Mô phỏng phòng lab", "D. Dự báo thời tiết"], correct: [0] },
+      { lesson: 5, type: "SINGLE", text: "Câu 6: Trong kênh phân phối, nhóm nào là thành viên chính thức?", options: ["A. Công ty vận tải", "B. Công ty nghiên cứu thị trường", "C. Nhà sản xuất, nhà bán buôn, nhà bán lẻ, người tiêu dùng cuối cùng", "D. Ngân hàng, công ty bảo hiểm, kho bãi"], correct: [2] },
+      { lesson: 5, type: "SINGLE", text: "Câu 7: Omnichannel Distribution hướng đến mục tiêu nào?", options: ["A. Chỉ bán hàng trực tiếp tại cửa hàng", "B. Tích hợp các kênh online và offline tạo trải nghiệm liền mạch", "C. Loại bỏ hoàn toàn kênh truyền thống", "D. Chỉ tập trung vào mạng xã hội"], correct: [1] },
+      { lesson: 5, type: "MULTIPLE", text: "Câu 8: Vai trò của trung gian phân phối là gì? (Chọn 2 đáp án)", options: ["A. Chỉ thực hiện hoạt động quảng cáo.", "B. Đưa sản phẩm đến khách hàng đúng thời gian, địa điểm.", "C. Làm tăng chi phí nên không cần thiết.", "D. Điều hòa cung cầu trên thị trường."], correct: [1, 3] },
+      { lesson: 5, type: "MULTIPLE", text: "Câu 9: Chiến lược Omnichannel hiệu quả thường yêu cầu: (Chọn 2 đáp án)", options: ["A. Kết nối dữ liệu giữa các kênh bán hàng.", "B. Đồng bộ thông tin tồn kho trên nhiều kênh.", "C. Tách biệt hoàn toàn kênh online và offline.", "D. Chỉ sử dụng một kênh bán hàng duy nhất."], correct: [0, 1] },
       { lesson: 5, type: "MATCHING", text: "Câu 10: Tổ chức bổ trợ trong phân phối. Xác định đúng/sai:", pairs: [{ item: "Chịu trách nhiệm trực tiếp doanh số", match: "SAI" }, { item: "Kho bãi giúp phân phối hiệu quả hơn", match: "ĐÚNG" }, { item: "Công ty vận tải thuộc nhóm bổ trợ", match: "ĐÚNG" }] },
-      { lesson: 5, type: "SINGLE", text: "Câu 11: Trong mô hình AISAS, chữ \"S\" đầu tiên là viết tắt của:", options: ["Sale", "Search", "Share", "Support"], correct: [1] },
-      { lesson: 5, type: "SINGLE", text: "Câu 12: Công cụ nào thuộc nhóm quảng cáo số (Digital Advertising)?", options: ["Google Ads", "Tài trợ sự kiện trực tiếp", "Hội chợ thương mại", "Họp báo truyền thống"], correct: [0] },
+      { lesson: 5, type: "SINGLE", text: "Câu 11: Trong mô hình AISAS, chữ \"S\" đầu tiên là viết tắt của:", options: ["A. Sale", "B. Search", "C. Share", "D. Support"], correct: [1] },
+      { lesson: 5, type: "SINGLE", text: "Câu 12: Công cụ nào thuộc nhóm quảng cáo số (Digital Advertising)?", options: ["A. Google Ads", "B. Tài trợ sự kiện trực tiếp", "C. Hội chợ thương mại", "D. Họp báo truyền thống"], correct: [0] },
       { lesson: 5, type: "MATCHING", text: "Câu 13: Khách nhận email gợi ý theo lịch sử mua. Đúng/sai:", pairs: [{ item: "Đây là quảng cáo ngoài trời", match: "SAI" }, { item: "Nội dung cá nhân hóa theo dữ liệu", match: "ĐÚNG" }, { item: "Là hoạt động Marketing trực tiếp tự động", match: "ĐÚNG" }] },
       { lesson: 5, type: "MATCHING", text: "Câu 14: Ghép giai đoạn AISAS với hành vi tương ứng:", pairs: [{ item: "Search", match: "Tìm kiếm thông tin sản phẩm trên Google" }, { item: "Attention", match: "Nhìn thấy quảng cáo lần đầu" }, { item: "Share", match: "Chia sẻ trải nghiệm lên mạng xã hội" }] },
-      { lesson: 5, type: "MULTIPLE", text: "Câu 15: Điểm khác biệt của chiến lược xúc tiến trong Digital Marketing so với truyền thống là: (Chọn 2 đáp án)", options: ["Tương tác hai chiều với khách hàng.", "Chỉ truyền thông một chiều từ doanh nghiệp.", "Cá nhân hóa nội dung dựa trên dữ liệu.", "Không thể đo lường hiệu quả chiến dịch."], correct: [0, 2] },
+      { lesson: 5, type: "MULTIPLE", text: "Câu 15: Điểm khác biệt của chiến lược xúc tiến trong Digital Marketing so với truyền thống là: (Chọn 2 đáp án)", options: ["A. Tương tác hai chiều với khách hàng.", "B. Chỉ truyền thông một chiều từ doanh nghiệp.", "C. Cá nhân hóa nội dung dựa trên dữ liệu.", "D. Không thể đo lường hiệu quả chiến dịch."], correct: [0, 2] },
       { lesson: 5, type: "MATCHING", text: "Câu 16: Ghép thành phần POEM với ví dụ phù hợp:", pairs: [{ item: "Owned Media", match: "Website doanh nghiệp" }, { item: "Earned Media", match: "Bài đăng đánh giá tự nhiên của khách" }, { item: "Paid Media", match: "Facebook Ads" }] },
-      { lesson: 5, type: "MULTIPLE", text: "Câu 17: Sàn TMĐT dùng AI điều chỉnh giá theo nhu cầu và đề xuất sản phẩm. Nhận định đúng: (Chọn 2)", options: ["Cá nhân hóa trải nghiệm sản phẩm.", "Phân biệt giá theo khu vực địa lý.", "Định giá theo chi phí cộng lãi.", "Định giá động."], correct: [0, 3] },
-      { lesson: 5, type: "MULTIPLE", text: "Câu 18: Đâu là hai nhận định đúng về chiến lược sản phẩm? (Chọn 2 đáp án)", options: ["Chiến lược sản phẩm là cơ sở để xây dựng giá, phân phối, xúc tiến.", "Chiến lược sản phẩm chỉ tập trung sản xuất.", "Chiến lược sản phẩm xác định phục vụ ai và mang lại lợi ích gì.", "Chiến lược sản phẩm chỉ áp dụng cho sản phẩm vật chất."], correct: [0, 2] },
+      { lesson: 5, type: "MULTIPLE", text: "Câu 17: Sàn TMĐT dùng AI điều chỉnh giá theo nhu cầu và đề xuất sản phẩm. Nhận định đúng: (Chọn 2)", options: ["A. Cá nhân hóa trải nghiệm sản phẩm.", "B. Phân biệt giá theo khu vực địa lý.", "C. Định giá theo chi phí cộng lãi.", "D. Định giá động."], correct: [0, 3] },
+      { lesson: 5, type: "MULTIPLE", text: "Câu 18: Đâu là hai nhận định đúng về chiến lược sản phẩm? (Chọn 2 đáp án)", options: ["A. Chiến lược sản phẩm là cơ sở để xây dựng giá, phân phối, xúc tiến.", "B. Chiến lược sản phẩm chỉ tập trung sản xuất.", "C. Chiến lược sản phẩm xác định phục vụ ai và mang lại lợi ích gì.", "D. Chiến lược sản phẩm chỉ áp dụng cho sản phẩm vật chất."], correct: [0, 2] },
       { lesson: 5, type: "MATCHING", text: "Câu 19: Doanh nghiệp dùng dữ liệu mua sắm để đề xuất sản phẩm. Đúng/sai:", pairs: [{ item: "Doanh nghiệp đang cá nhân hóa sản phẩm", match: "ĐÚNG" }, { item: "Việc này hoàn toàn không liên quan Marketing số", match: "SAI" }, { item: "Dữ liệu hành vi được dùng nâng cao trải nghiệm", match: "ĐÚNG" }] },
-      { lesson: 5, type: "MULTIPLE", text: "Câu 20: Doanh nghiệp có thể bán sản phẩm với giá cao hơn khi: (Chọn 2 đáp án)", options: ["Sản phẩm có sự khác biệt rõ ràng so với đối thủ.", "Sản phẩm không có giá trị nổi bật.", "Thương hiệu được định vị cao cấp.", "Khách hàng có nhiều sản phẩm thay thế giống hệt."], correct: [0, 2] },
-      { lesson: 5, type: "SINGLE", text: "Câu 21: Ba mâu thuẫn cơ bản mà kênh phân phối giúp giải quyết là gì?", options: ["Mâu thuẫn về giá, thương hiệu và quảng cáo.", "Mâu thuẫn về khối lượng, không gian và thời gian.", "Mâu thuẫn về sản xuất và tài chính.", "Mâu thuẫn về công nghệ và nhân lực."], correct: [1] },
-      { lesson: 5, type: "MULTIPLE", text: "Câu 22: Doanh nghiệp áp dụng hệ thống phân phối đa kênh (MDS) nhằm: (Chọn 2 đáp án)", options: ["Tiếp cận nhiều phân đoạn khách hàng hơn.", "Giảm hoàn toàn xung đột giữa các kênh.", "Sử dụng đồng thời nhiều kênh bán hàng khác nhau.", "Chỉ bán hàng qua internet."], correct: [0, 2] },
-      { lesson: 5, type: "SINGLE", text: "Câu 23: Hoạt động hợp tác với KOLs/KOCs để quảng bá thương hiệu thuộc nhóm nào?", options: ["Digital PR & Influencer Marketing", "Phân phối đa kênh", "Bán hàng cá nhân", "Marketing trực tiếp truyền thống"], correct: [0] },
+      { lesson: 5, type: "MULTIPLE", text: "Câu 20: Doanh nghiệp có thể bán sản phẩm với giá cao hơn khi: (Chọn 2 đáp án)", options: ["A. Sản phẩm có sự khác biệt rõ ràng so với đối thủ.", "B. Sản phẩm không có giá trị nổi bật.", "C. Thương hiệu được định vị cao cấp.", "D. Khách hàng có nhiều sản phẩm thay thế giống hệt."], correct: [0, 2] },
+      { lesson: 5, type: "SINGLE", text: "Câu 21: Ba mâu thuẫn cơ bản mà kênh phân phối giúp giải quyết là gì?", options: ["A. Mâu thuẫn về giá, thương hiệu và quảng cáo.", "B. Mâu thuẫn về khối lượng, không gian và thời gian.", "C. Mâu thuẫn về sản xuất và tài chính.", "D. Mâu thuẫn về công nghệ và nhân lực."], correct: [1] },
+      { lesson: 5, type: "MULTIPLE", text: "Câu 22: Doanh nghiệp áp dụng hệ thống phân phối đa kênh (MDS) nhằm: (Chọn 2 đáp án)", options: ["A. Tiếp cận nhiều phân đoạn khách hàng hơn.", "B. Giảm hoàn toàn xung đột giữa các kênh.", "C. Sử dụng đồng thời nhiều kênh bán hàng khác nhau.", "D. Chỉ bán hàng qua internet."], correct: [0, 2] },
+      { lesson: 5, type: "SINGLE", text: "Câu 23: Hoạt động hợp tác với KOLs/KOCs để quảng bá thương hiệu thuộc nhóm nào?", options: ["A. Digital PR & Influencer Marketing", "B. Phân phối đa kênh", "C. Bán hàng cá nhân", "D. Marketing trực tiếp truyền thống"], correct: [0] },
       { lesson: 5, type: "MATCHING", text: "Câu 24: Doanh nghiệp triển khai mã giảm giá điện tử và minigame. Đúng/sai:", pairs: [{ item: "Hoạt động này thuộc PR truyền thống", match: "SAI" }, { item: "Đây là hoạt động khuyến mại số", match: "ĐÚNG" }, { item: "Mục tiêu kích thích hành vi mua nhanh hơn", match: "ĐÚNG" }] },
-      { lesson: 5, type: "MULTIPLE", text: "Câu 25: Trước khi đầu tư phát triển toàn diện ứng dụng mới, doanh nghiệp cần: (Chọn 2 đáp án)", options: ["Công bố toàn quốc ngay lập tức.", "Nghiên cứu khách hàng.", "Đánh giá khả năng sinh lời của ý tưởng.", "Xem xét nguồn lực và công nghệ hiện có."], correct: [1, 2] },
-      { lesson: 5, type: "MULTIPLE", text: "Câu 26: Các tổ chức bổ trợ trong kênh phân phối có đặc điểm: (Chọn 2 đáp án)", options: ["Không trực tiếp chịu trách nhiệm về kết quả kinh doanh của kênh.", "Là người tiêu dùng cuối cùng.", "Hỗ trợ hoạt động phân phối bằng dịch vụ chuyên môn.", "Trực tiếp sở hữu hàng hóa để bán."], correct: [0, 2] },
+      { lesson: 5, type: "MULTIPLE", text: "Câu 25: Trước khi đầu tư phát triển toàn diện ứng dụng mới, doanh nghiệp cần: (Chọn 2 đáp án)", options: ["A. Công bố toàn quốc ngay lập tức.", "B. Nghiên cứu khách hàng.", "C. Đánh giá khả năng sinh lời của ý tưởng.", "D. Xem xét nguồn lực và công nghệ hiện có."], correct: [1, 2] },
+      { lesson: 5, type: "MULTIPLE", text: "Câu 26: Các tổ chức bổ trợ trong kênh phân phối có đặc điểm: (Chọn 2 đáp án)", options: ["A. Không trực tiếp chịu trách nhiệm về kết quả kinh doanh của kênh.", "B. Là người tiêu dùng cuối cùng.", "C. Hỗ trợ hoạt động phân phối bằng dịch vụ chuyên môn.", "D. Trực tiếp sở hữu hàng hóa để bán."], correct: [0, 2] },
       { lesson: 5, type: "MATCHING", text: "Câu 27: Nhận được email gợi ý dựa trên lịch sử mua. Đánh giá:", pairs: [{ item: "Nội dung cá nhân hóa theo dữ liệu", match: "ĐÚNG" }, { item: "Là hoạt động Marketing trực tiếp tự động", match: "ĐÚNG" }, { item: "Là ví dụ của quảng cáo ngoài trời", match: "SAI" }] },
       { lesson: 5, type: "MATCHING", text: "Câu 28: Ghép thành viên với nhóm tương ứng:", pairs: [{ item: "Ngân hàng, Công ty vận tải", match: "Tổ chức bổ trợ" }, { item: "Nhà bán lẻ", match: "Thành viên chính thức" }] },
-      { lesson: 5, type: "SINGLE", text: "Câu 29: Doanh nghiệp hiển thị quảng cáo cho những khách từng truy cập website nhưng chưa mua. Hoạt động này gọi là ...", options: ["Remarketing", "SEO", "Spam mail", "Digital PR"], correct: [0] },
-      { lesson: 5, type: "MULTIPLE", text: "Câu 30: Chuẩn bị tung ứng dụng mới, doanh nghiệp cần làm gì? (Chọn 2 đáp án)", options: ["Đánh giá khả năng sinh lời của ý tưởng.", "Xem xét nguồn lực và công nghệ hiện có.", "Công bố toàn quốc ngay lập tức.", "Ngừng nghiên cứu khách hàng."], correct: [0, 1] },
+      { lesson: 5, type: "SINGLE", text: "Câu 29: Doanh nghiệp hiển thị quảng cáo cho những khách từng truy cập website nhưng chưa mua. Hoạt động này gọi là ...", options: ["A. Remarketing", "B. SEO", "C. Spam mail", "D. Digital PR"], correct: [0] },
+      { lesson: 5, type: "MULTIPLE", text: "Câu 30: Chuẩn bị tung ứng dụng mới, doanh nghiệp cần làm gì? (Chọn 2 đáp án)", options: ["A. Đánh giá khả năng sinh lời của ý tưởng.", "B. Xem xét nguồn lực và công nghệ hiện có.", "C. Công bố toàn quốc ngay lập tức.", "D. Ngừng nghiên cứu khách hàng."], correct: [0, 1] },
 
       // BÀI 6
-      { lesson: 6, type: "SINGLE", text: "Câu 1: Theo mô hình của Teresa Amabile, sự sáng tạo nảy sinh từ sự hợp lưu của ba thành phần nào?", options: ["Kiến thức, Tư duy sáng tạo, Động lực.", "Kiến thức, Công nghệ, Tiền bạc.", "Kỹ năng viết, Kỹ năng đồ họa, Kỹ năng chạy Ads.", "Ý tưởng mới, Đối thủ cạnh tranh, Khách hàng."], correct: [0] },
-      { lesson: 6, type: "SINGLE", text: "Câu 2: Ovaltine đưa ra thông điệp \"Chẳng cần nhà vô địch, chỉ cần con thích là được\" phản hồi Milo. Đây là loại tư duy gì?", options: ["Tư duy ngược", "Tư duy gây tranh cãi", "Tư duy sao chép", "Tư duy nhất"], correct: [0] },
-      { lesson: 6, type: "SINGLE", text: "Câu 3: Việc sử dụng các chủ đề liên quan đến tôn giáo, chính trị hoặc sắc tộc để thu hút truyền thông gọi là ....", options: ["Tư duy hệ thống", "Tư duy logic", "Tư duy tích cực", "Tư duy gây tranh cãi"], correct: [3] },
-      { lesson: 6, type: "SINGLE", text: "Câu 4: Quán cà phê đăng: \"Đừng đến quán em nếu anh chị lười tìm đường\". Mục đích chính của tiêu đề này là gì?", options: ["Để giảm bớt số lượng khách.", "Do nhân viên quá bận.", "Tiết kiệm chi phí.", "Kích thích sự tò mò và tăng tỷ lệ nhấp (CTR)."], correct: [3] },
-      { lesson: 6, type: "SINGLE", text: "Câu 5: Làm video quảng cáo trông \"nghiệp dư\" bằng điện thoại thay vì thuê ê-kíp chuyên nghiệp. Đây là cách làm ngược về yếu tố nào?", options: ["Ngược về giá bán", "Ngược về thông điệp", "Ngược về kênh phân phối", "Ngược về định dạng nội dung"], correct: [3] },
-      { lesson: 6, type: "SINGLE", text: "Câu 6: Việc gửi chuỗi Email chia sẻ kiến thức \"Nghệ thuật chọn quà ngoại giao\" nhằm mục đích gì?", options: ["Quảng cáo đại trà", "Khơi gợi nhu cầu tái mua hàng từ khách hàng cũ", "Giảm chi phí nhân sự", "Spam hộp thư"], correct: [1] },
-      { lesson: 6, type: "SINGLE", text: "Câu 7: \"Khát khao về sự thành công và ý tưởng\" thuộc về thành phần nào trong mô hình Amabile?", options: ["Áp lực bên ngoài", "Tư duy sáng tạo", "Động lực nội tại", "Kiến thức"], correct: [2] },
-      { lesson: 6, type: "SINGLE", text: "Câu 8: Để đảm bảo công bằng và minh bạch ở bước Đo lường hiệu quả, doanh nghiệp cần:", options: ["Đo lường bài viết có chạy ads", "Sử dụng các công cụ đo lường và tiêu chí đánh giá cụ thể.", "Xem doanh số tăng là đủ", "Trả lương thưởng thích đáng"], correct: [1] },
-      { lesson: 6, type: "SINGLE", text: "Câu 9: Tại sao cần xây dựng văn hóa \"Thử nghiệm nhanh - Sai nhanh - Sửa nhanh\" trong Marketing số?", options: ["Để chi tiêu hoàn toàn ngân sách", "Vì thuật toán và hành vi người dùng biến đổi rất nhanh", "Gây khó khăn cho đối thủ", "Vì doanh nghiệp dư thừa ngân sách"], correct: [1] },
-      { lesson: 6, type: "MULTIPLE", text: "Câu 10: Các tiêu chí đo lường nội dung không quảng cáo (Organic) bao gồm? (Chọn 2 đáp án)", options: ["Tỷ lệ nhấp chuột từ quảng cáo Search.", "Lượt xem, đọc và tương tác tự nhiên", "Chi phí trên mỗi đơn hàng (CPA).", "Số lượng bài viết, hình ảnh đăng tải hàng tháng."], correct: [1, 3] },
-      { lesson: 6, type: "MULTIPLE", text: "Câu 11: Trong bước Lên kế hoạch, những hoạt động nào giúp doanh nghiệp hiểu rõ khách hàng mục tiêu? (Chọn 2 đáp án)", options: ["Đo lường CTR của chiến dịch.", "Nghiên cứu độ tuổi, sở thích và hành vi khách hàng.", "Thiết lập ngân sách quảng cáo.", "Tìm hiểu nỗi đau và động cơ mua hàng của khách hàng."], correct: [1, 3] },
-      { lesson: 6, type: "MULTIPLE", text: "Câu 12: Những nhận định nào đúng về hình thức thuê ngoài (outsourcing) trong bước Thực thi? (Chọn 2 đáp án)", options: ["Luôn dễ kiểm soát tiến độ hơn tự làm.", "Không cần kiểm tra chất lượng sản phẩm.", "Giúp doanh nghiệp tận dụng chuyên môn của đơn vị bên ngoài.", "Giảm nhu cầu đầu tư trang thiết bị và nhân sự chuyên sâu."], correct: [2, 3] },
-      { lesson: 6, type: "MULTIPLE", text: "Câu 13: Trước khi sản xuất nội dung bộ quà tặng doanh nhân, nhóm Marketing cần làm gì? (Chọn 2 đáp án)", options: ["Tìm hiểu động cơ và tâm lý khách hàng mục tiêu.", "Đo lường tỷ lệ chuyển đổi.", "Chạy quảng cáo ngay.", "Nghiên cứu đối thủ cạnh tranh trên thị trường."], correct: [0, 3] },
+      { lesson: 6, type: "SINGLE", text: "Câu 1: Theo mô hình của Teresa Amabile, sự sáng tạo nảy sinh từ sự hợp lưu của ba thành phần nào?", options: ["A. Kiến thức, Tư duy sáng tạo, Động lực.", "B. Kiến thức, Công nghệ, Tiền bạc.", "C. Kỹ năng viết, Kỹ năng đồ họa, Kỹ năng chạy Ads.", "D. Ý tưởng mới, Đối thủ cạnh tranh, Khách hàng."], correct: [0] },
+      { lesson: 6, type: "SINGLE", text: "Câu 2: Ovaltine đưa ra thông điệp \"Chẳng cần nhà vô địch, chỉ cần con thích là được\" phản hồi Milo. Đây là loại tư duy gì?", options: ["A. Tư duy ngược", "B. Tư duy gây tranh cãi", "C. Tư duy sao chép", "D. Tư duy nhất"], correct: [0] },
+      { lesson: 6, type: "SINGLE", text: "Câu 3: Việc sử dụng các chủ đề liên quan đến tôn giáo, chính trị hoặc sắc tộc để thu hút truyền thông gọi là ....", options: ["A. Tư duy hệ thống", "B. Tư duy logic", "C. Tư duy tích cực", "D. Tư duy gây tranh cãi"], correct: [3] },
+      { lesson: 6, type: "SINGLE", text: "Câu 4: Quán cà phê đăng: \"Đừng đến quán em nếu anh chị lười tìm đường\". Mục đích chính của tiêu đề này là gì?", options: ["A. Để giảm bớt số lượng khách.", "B. Do nhân viên quá bận.", "C. Tiết kiệm chi phí.", "D. Kích thích sự tò mò và tăng tỷ lệ nhấp (CTR)."], correct: [3] },
+      { lesson: 6, type: "SINGLE", text: "Câu 5: Làm video quảng cáo trông \"nghiệp dư\" bằng điện thoại thay vì thuê ê-kíp chuyên nghiệp. Đây là cách làm ngược về yếu tố nào?", options: ["A. Ngược về giá bán", "B. Ngược về thông điệp", "C. Ngược về kênh phân phối", "D. Ngược về định dạng nội dung"], correct: [3] },
+      { lesson: 6, type: "SINGLE", text: "Câu 6: Việc gửi chuỗi Email chia sẻ kiến thức \"Nghệ thuật chọn quà ngoại giao\" nhằm mục đích gì?", options: ["A. Quảng cáo đại trà", "B. Khơi gợi nhu cầu tái mua hàng từ khách hàng cũ", "C. Giảm chi phí nhân sự", "D. Spam hộp thư"], correct: [1] },
+      { lesson: 6, type: "SINGLE", text: "Câu 7: \"Khát khao về sự thành công và ý tưởng\" thuộc về thành phần nào trong mô hình Amabile?", options: ["A. Áp lực bên ngoài", "B. Tư duy sáng tạo", "C. Động lực nội tại", "D. Kiến thức"], correct: [2] },
+      { lesson: 6, type: "SINGLE", text: "Câu 8: Để đảm bảo công bằng và minh bạch ở bước Đo lường hiệu quả, doanh nghiệp cần:", options: ["A. Đo lường bài viết có chạy ads", "B. Sử dụng các công cụ đo lường và tiêu chí đánh giá cụ thể.", "C. Xem doanh số tăng là đủ", "D. Trả lương thưởng thích đáng"], correct: [1] },
+      { lesson: 6, type: "SINGLE", text: "Câu 9: Tại sao cần xây dựng văn hóa \"Thử nghiệm nhanh - Sai nhanh - Sửa nhanh\" trong Marketing số?", options: ["A. Để chi tiêu hoàn toàn ngân sách", "B. Vì thuật toán và hành vi người dùng biến đổi rất nhanh", "C. Gây khó khăn cho đối thủ", "D. Vì doanh nghiệp dư thừa ngân sách"], correct: [1] },
+      { lesson: 6, type: "MULTIPLE", text: "Câu 10: Các tiêu chí đo lường nội dung không quảng cáo (Organic) bao gồm? (Chọn 2 đáp án)", options: ["A. Tỷ lệ nhấp chuột từ quảng cáo Search.", "B. Lượt xem, đọc và tương tác tự nhiên", "C. Chi phí trên mỗi đơn hàng (CPA).", "D. Số lượng bài viết, hình ảnh đăng tải hàng tháng."], correct: [1, 3] },
+      { lesson: 6, type: "MULTIPLE", text: "Câu 11: Trong bước Lên kế hoạch, những hoạt động nào giúp doanh nghiệp hiểu rõ khách hàng mục tiêu? (Chọn 2 đáp án)", options: ["A. Đo lường CTR của chiến dịch.", "B. Nghiên cứu độ tuổi, sở thích và hành vi khách hàng.", "C. Thiết lập ngân sách quảng cáo.", "D. Tìm hiểu nỗi đau và động cơ mua hàng của khách hàng."], correct: [1, 3] },
+      { lesson: 6, type: "MULTIPLE", text: "Câu 12: Những nhận định nào đúng về hình thức thuê ngoài (outsourcing) trong bước Thực thi? (Chọn 2 đáp án)", options: ["A. Luôn dễ kiểm soát tiến độ hơn tự làm.", "B. Không cần kiểm tra chất lượng sản phẩm.", "C. Giúp doanh nghiệp tận dụng chuyên môn của đơn vị bên ngoài.", "D. Giảm nhu cầu đầu tư trang thiết bị và nhân sự chuyên sâu."], correct: [2, 3] },
+      { lesson: 6, type: "MULTIPLE", text: "Câu 13: Trước khi sản xuất nội dung bộ quà tặng doanh nhân, nhóm Marketing cần làm gì? (Chọn 2 đáp án)", options: ["A. Tìm hiểu động cơ và tâm lý khách hàng mục tiêu.", "B. Đo lường tỷ lệ chuyển đổi.", "C. Chạy quảng cáo ngay.", "D. Nghiên cứu đối thủ cạnh tranh trên thị trường."], correct: [0, 3] },
       { lesson: 6, type: "MATCHING", text: "Câu 14: Đánh giá đúng/sai cho chiến dịch thời trang:", pairs: [{ item: "Nội dung hiệu quả nên xem xét tăng ngân sách", match: "ĐÚNG" }, { item: "Google Analytics hỗ trợ đánh giá hiệu quả", match: "ĐÚNG" }, { item: "Nghiên cứu khách hàng thuộc bước Lên kế hoạch", match: "ĐÚNG" }, { item: "Chạy quảng cáo TikTok thuộc bước Đo lường", match: "SAI" }] },
       { lesson: 6, type: "MATCHING", text: "Câu 15: Điền từ vào chỗ trống trong tình huống tối ưu bài viết:", pairs: [{ item: "Phát hiện bài CTR cao thuộc bước", match: "Đo lường" }, { item: "Kết quả được sử dụng để", match: "Tối ưu" }] },
-      { lesson: 6, type: "SINGLE", text: "Câu 16: Chiến dịch “I’m no angel” dùng phụ nữ bình thường để đối lập với “thiên thần” Victoria’s Secret là ví dụ của:", options: ["Tư duy “Gây tranh cãi”", "Tư duy “Đám đông”", "Tư duy “Nhất”", "Tư duy “Ngược”"], correct: [3] },
-      { lesson: 6, type: "SINGLE", text: "Câu 17: Ưu điểm của thuê ngoài (Outsourcing) là doanh nghiệp không phải duy trì .... nhưng cần kiểm soát tiến độ.", options: ["Trang thiết bị sản xuất hiện đại", "Văn phòng làm việc tiện nghi", "Khách hàng", "Số lượng nhân viên chuyên trách cố định"], correct: [3] },
-      { lesson: 6, type: "SINGLE", text: "Câu 18: Đội ngũ nhận thấy quà tặng đối thủ thường là hộp giấy/lon thiếc bình dân. Đây là hoạt động:", options: ["Hiểu sâu sản phẩm mình", "Đo lường hiệu quả quảng cáo", "Thấu hiểu nỗi đau khách", "Nghiên cứu đối thủ để tìm khoảng trống thị trường"], correct: [3] },
-      { lesson: 6, type: "MULTIPLE", text: "Câu 19: Những rủi ro khi sử dụng \"Tư duy gây tranh cãi\" là gì? (Chọn 2 đáp án)", options: ["Tiết kiệm chi phí truyền thông.", "Làm ảnh hưởng xấu đến hình ảnh thương hiệu.", "Tăng lượng tìm kiếm quá nhanh.", "Khó kiểm soát được hướng đi của cuộc tranh luận."], correct: [1, 3] },
-      { lesson: 6, type: "SINGLE", text: "Câu 20: Tư duy ngược là việc ngừng tập trung vào thương hiệu để tập trung hoàn toàn vào loại bỏ các .... của khách hàng.", options: ["Đối thủ cạnh tranh", "Mã giảm giá", "Rào cản, sự khó chịu và nhàm chán", "Nhân viên bán hàng"], correct: [2] },
-      { lesson: 6, type: "SINGLE", text: "Câu 21: \"Sự sung sướng ẩn sâu\" của khách mua trà biếu là được người nhận công nhận mình là người có ....", options: ["Nhiều tiền, giàu có", "Gu thẩm mỹ tinh tế và am hiểu văn hóa", "Khả năng ngoại giao", "Quyền lực"], correct: [1] },
-      { lesson: 6, type: "SINGLE", text: "Câu 22: Bài viết xoáy vào \"Nỗi sợ mất uy tín doanh nghiệp khi tặng quà kém\" mang lại 120 đơn. Đây là kỹ thuật:", options: ["Quảng cáo tính năng", "Giảm giá", "Xoáy vào niềm vui", "Xoáy vào nỗi buồn/nỗi sợ của khách hàng"], correct: [3] },
-      { lesson: 6, type: "SINGLE", text: "Câu 23: Giám đốc áp KPI thiết kế phải xong ảnh trước 3 ngày để kiểm soát chất lượng. Đây là bước nào?", options: ["Lên kế hoạch", "Thúc đẩy", "Thực thi", "Đo lường"], correct: [2] },
-      { lesson: 6, type: "MULTIPLE", text: "Câu 24: Đâu là hai lợi ích của việc nghiên cứu đối thủ cạnh tranh? (Chọn 2 đáp án)", options: ["Tìm cơ hội xây dựng nội dung nổi bật hơn.", "Xác định điểm khác biệt của sản phẩm.", "Tăng ngay số lượng người theo dõi.", "Thay thế hoàn toàn nghiên cứu khách hàng."], correct: [0, 1] },
-      { lesson: 6, type: "MULTIPLE", text: "Câu 25: Thương hiệu trà muốn đánh trúng cảm xúc doanh nhân cần nghiên cứu kỹ yếu tố nào? (Chọn 2 đáp án)", options: ["Màu sắc logo đối thủ.", "Nỗi đau khi lựa chọn quà tặng.", "Động cơ và mong muốn được công nhận.", "Tốc độ mạng internet."], correct: [1, 2] },
-      { lesson: 6, type: "MULTIPLE", text: "Câu 26: Công cụ nào phù hợp với bước \"Thúc đẩy\" để tăng độ phủ video? (Chọn 2 đáp án)", options: ["Google Docs", "Facebook Ads", "Microsoft Word", "Google Ads"], correct: [1, 3] },
+      { lesson: 6, type: "SINGLE", text: "Câu 16: Chiến dịch “I’m no angel” dùng phụ nữ bình thường để đối lập với “thiên thần” Victoria’s Secret là ví dụ của:", options: ["A. Tư duy “Gây tranh cãi”", "B. Tư duy “Đám đông”", "C. Tư duy “Nhất”", "D. Tư duy “Ngược”"], correct: [3] },
+      { lesson: 6, type: "SINGLE", text: "Câu 17: Ưu điểm của thuê ngoài (Outsourcing) là doanh nghiệp không phải duy trì .... nhưng cần kiểm soát tiến độ.", options: ["A. Trang thiết bị sản xuất hiện đại", "B. Văn phòng làm việc tiện nghi", "C. Khách hàng", "D. Số lượng nhân viên chuyên trách cố định"], correct: [3] },
+      { lesson: 6, type: "SINGLE", text: "Câu 18: Đội ngũ nhận thấy quà tặng đối thủ thường là hộp giấy/lon thiếc bình dân. Đây là hoạt động:", options: ["A. Hiểu sâu sản phẩm mình", "B. Đo lường hiệu quả quảng cáo", "C. Thấu hiểu nỗi đau khách", "D. Nghiên cứu đối thủ để tìm khoảng trống thị trường"], correct: [3] },
+      { lesson: 6, type: "MULTIPLE", text: "Câu 19: Những rủi ro khi sử dụng \"Tư duy gây tranh cãi\" là gì? (Chọn 2 đáp án)", options: ["A. Tiết kiệm chi phí truyền thông.", "B. Làm ảnh hưởng xấu đến hình ảnh thương hiệu.", "C. Tăng lượng tìm kiếm quá nhanh.", "D. Khó kiểm soát được hướng đi của cuộc tranh luận."], correct: [1, 3] },
+      { lesson: 6, type: "SINGLE", text: "Câu 20: Tư duy ngược là việc ngừng tập trung vào thương hiệu để tập trung hoàn toàn vào loại bỏ các .... của khách hàng.", options: ["A. Đối thủ cạnh tranh", "B. Mã giảm giá", "C. Rào cản, sự khó chịu và nhàm chán", "D. Nhân viên bán hàng"], correct: [2] },
+      { lesson: 6, type: "SINGLE", text: "Câu 21: \"Sự sung sướng ẩn sâu\" của khách mua trà biếu là được người nhận công nhận mình là người có ....", options: ["A. Nhiều tiền, giàu có", "B. Gu thẩm mỹ tinh tế và am hiểu văn hóa", "C. Khả năng ngoại giao", "D. Quyền lực"], correct: [1] },
+      { lesson: 6, type: "SINGLE", text: "Câu 22: Bài viết xoáy vào \"Nỗi sợ mất uy tín doanh nghiệp khi tặng quà kém\" mang lại 120 đơn. Đây là kỹ thuật:", options: ["A. Quảng cáo tính năng", "B. Giảm giá", "C. Xoáy vào niềm vui", "D. Xoáy vào nỗi buồn/nỗi sợ của khách hàng"], correct: [3] },
+      { lesson: 6, type: "SINGLE", text: "Câu 23: Giám đốc áp KPI thiết kế phải xong ảnh trước 3 ngày để kiểm soát chất lượng. Đây là bước nào?", options: ["A. Lên kế hoạch", "B. Thúc đẩy", "C. Thực thi", "D. Đo lường"], correct: [2] },
+      { lesson: 6, type: "MULTIPLE", text: "Câu 24: Đâu là hai lợi ích của việc nghiên cứu đối thủ cạnh tranh? (Chọn 2 đáp án)", options: ["A. Tìm cơ hội xây dựng nội dung nổi bật hơn.", "B. Xác định điểm khác biệt của sản phẩm.", "C. Tăng ngay số lượng người theo dõi.", "D. Thay thế hoàn toàn nghiên cứu khách hàng."], correct: [0, 1] },
+      { lesson: 6, type: "MULTIPLE", text: "Câu 25: Thương hiệu trà muốn đánh trúng cảm xúc doanh nhân cần nghiên cứu kỹ yếu tố nào? (Chọn 2 đáp án)", options: ["A. Màu sắc logo đối thủ.", "B. Nỗi đau khi lựa chọn quà tặng.", "C. Động cơ và mong muốn được công nhận.", "D. Tốc độ mạng internet."], correct: [1, 2] },
+      { lesson: 6, type: "MULTIPLE", text: "Câu 26: Công cụ nào phù hợp với bước \"Thúc đẩy\" để tăng độ phủ video? (Chọn 2 đáp án)", options: ["A. Google Docs", "B. Facebook Ads", "C. Microsoft Word", "D. Google Ads"], correct: [1, 3] },
       { lesson: 6, type: "MATCHING", text: "Câu 27: Ghép hoạt động với bước tương ứng trong quy trình sáng tạo:", pairs: [{ item: "Chạy quảng cáo Facebook", match: "Thúc đẩy" }, { item: "Phân tích CTR bằng GA4", match: "Đo lường" }, { item: "Quay video giới thiệu", match: "Thực thi" }, { item: "Nghiên cứu khách hàng", match: "Lên kế hoạch" }] },
-      { lesson: 6, type: "SINGLE", text: "Câu 28: Để tối đa hóa tiềm năng sáng tạo, cá nhân nên phát triển tư duy theo dạng nào?", options: ["Hình tam giác", "Hình chữ T", "Hình tròn", "Hình chữ I"], correct: [1] },
+      { lesson: 6, type: "SINGLE", text: "Câu 28: Để tối đa hóa tiềm năng sáng tạo, cá nhân nên phát triển tư duy theo dạng nào?", options: ["A. Hình tam giác", "B. Hình chữ T", "C. Hình tròn", "D. Hình chữ I"], correct: [1] },
 
       // BÀI 7
-      { lesson: 7, type: "MULTIPLE", text: "Câu 1: Những hoạt động nào thuộc phương pháp Tiếp cận qua Digital (Online)? (Chọn 2 đáp án)", options: ["Email Marketing", "Phát tờ rơi tại ngã tư", "Hội thảo khách hàng", "SEO"], correct: [0, 3] },
-      { lesson: 7, type: "SINGLE", text: "Câu 2: Doanh nghiệp F&B muốn tiếp cận khách hàng. Bước đầu tiên cần làm theo quy trình là gì?", options: ["In 10.000 tờ rơi", "Thuê mặt bằng trung tâm", "Chạy quảng cáo Facebook ngay", "Xác định chân dung khách hàng (tuổi, sở thích, hành vi)."], correct: [3] },
-      { lesson: 7, type: "SINGLE", text: "Câu 3: Công ty bất động sản gọi điện thoại trực tiếp cho danh sách khách hàng tiềm năng. Đây là phương pháp nào?", options: ["Telesales", "Mạng xã hội", "SEO", "Email Marketing"], correct: [0] },
+      { lesson: 7, type: "MULTIPLE", text: "Câu 1: Những hoạt động nào thuộc phương pháp Tiếp cận qua Digital (Online)? (Chọn 2 đáp án)", options: ["A. Email Marketing", "B. Phát tờ rơi tại ngã tư", "C. Hội thảo khách hàng", "D. SEO"], correct: [0, 3] },
+      { lesson: 7, type: "SINGLE", text: "Câu 2: Doanh nghiệp F&B muốn tiếp cận khách hàng. Bước đầu tiên cần làm theo quy trình là gì?", options: ["A. In 10.000 tờ rơi", "B. Thuê mặt bằng trung tâm", "C. Chạy quảng cáo Facebook ngay", "D. Xác định chân dung khách hàng (tuổi, sở thích, hành vi)."], correct: [3] },
+      { lesson: 7, type: "SINGLE", text: "Câu 3: Công ty bất động sản gọi điện thoại trực tiếp cho danh sách khách hàng tiềm năng. Đây là phương pháp nào?", options: ["A. Telesales", "B. Mạng xã hội", "C. SEO", "D. Email Marketing"], correct: [0] },
       { lesson: 7, type: "MATCHING", text: "Câu 4: Ghép kênh với phương pháp tiếp cận:", pairs: [{ item: "Zalo/TikTok", match: "Mạng xã hội" }, { item: "Hội thảo khách hàng", match: "Trực tiếp (Offline)" }, { item: "Google Search", match: "Công cụ tìm kiếm" }] },
-      { lesson: 7, type: "SINGLE", text: "Câu 5: Nhãn hàng mỹ phẩm muốn khách hàng tự tìm đến mình khi search \"cách trị mụn\". Nên ưu tiên công cụ nào?", options: ["Gửi tin nhắn SMS", "Telesales", "Phát tờ rơi", "SEO Website hoặc Quảng cáo Google"], correct: [3] },
-      { lesson: 7, type: "SINGLE", text: "Câu 6: Rao vặt sản phẩm trên hệ thống chợ trực tuyến tích hợp trong Facebook dùng tính năng nào?", options: ["Facebook Marketplace", "Facebook Watch", "Facebook Profile", "Facebook Groups"], correct: [0] },
-      { lesson: 7, type: "SINGLE", text: "Câu 7: Doanh nghiệp bị đưa tin tiêu cực trên các tờ báo điện tử lớn gây ra hậu quả gì?", options: ["Tăng giá trị tài sản số", "Tăng doanh số đột biến", "Giúp website chuẩn SEO hơn", "Suy giảm danh tiếng, tín nhiệm, thậm chí phá sản."], correct: [3] },
-      { lesson: 7, type: "SINGLE", text: "Câu 8: Tận dụng lượng người dùng khổng lồ và chủ động tìm kiếm trên các sàn .... giúp Content Marketing tiếp cận dễ dàng hơn.", options: ["Mạng xã hội", "Email", "Blog cá nhân", "Thương mại điện tử (Shopee, Lazada,...)"], correct: [3] },
-      { lesson: 7, type: "SINGLE", text: "Câu 9: Điền từ phù hợp: \".... được coi là kênh phân phối thông tin chính thức, giúp đảm bảo độ tin cậy cao hơn các kênh mạng xã hội.\"", options: ["Website", "Remarketing", "Email Marketing", "TV"], correct: [0] },
-      { lesson: 7, type: "MULTIPLE", text: "Câu 10: Những tính năng nào sau đây thuộc \"siêu ứng dụng\" Zalo? (Chọn 2 đáp án)", options: ["Zalo Pay", "Zalo seller", "Zalo OA", "Zalo Central"], correct: [0, 2] },
-      { lesson: 7, type: "MULTIPLE", text: "Câu 11: Hai chỉ số nào thường dùng để đo lường chi phí thu hút khách hàng trên nền tảng quảng cáo? (Chọn 2 đáp án)", options: ["NPS (Net Promoter Score)", "CPM (Cost Per Mille)", "CPC (Cost Per Click)", "CLV (Customer Lifetime Value)"], correct: [1, 2] },
-      { lesson: 7, type: "SINGLE", text: "Câu 12: Tại sao doanh nghiệp cần liên tục thu hút khách hàng mới trong môi trường số?", options: ["Để giảm lương nhân viên", "Để không phải khuyến mãi", "Để bù đắp lượng khách hàng rời bỏ (churn rate) tự nhiên.", "Để website nhiều ảnh hơn"], correct: [2] },
-      { lesson: 7, type: "SINGLE", text: "Câu 13: Chuyển đổi vi mô (Micro-conversion) được hiểu là gì?", options: ["Khách rời bỏ sau 3 giây", "Khách chia sẻ bài viết", "Hành động mang lại doanh thu trực tiếp", "Các bước đệm như điền form, tải tài liệu, thêm vào giỏ."], correct: [3] },
-      { lesson: 7, type: "SINGLE", text: "Câu 14: Khách thoát ngay vì trang tải quá chậm (trên 3s). Nguyên nhân gây thấp chuyển đổi là do:", options: ["Trải nghiệm người dùng (UX/UI) kém.", "Thông điệp thiếu thuyết phục.", "Ma sát phễu quá lớn.", "Sai tệp khách hàng."], correct: [0] },
-      { lesson: 7, type: "SINGLE", text: "Câu 15: Tối ưu hóa tỷ lệ chuyển đổi (CRO) là quy trình khoa học dựa trên ....", options: ["Ý kiến ban giám đốc", "Xu hướng đối thủ", "Dữ liệu (Analytics)", "Kinh nghiệm lâu năm"], correct: [2] },
-      { lesson: 7, type: "SINGLE", text: "Câu 16: Áp dụng linh hoạt các phương pháp tiếp cận giúp chuyển đổi .... thành người mua hàng dễ dàng hơn.", options: ["Khách hàng thân thiết", "Đối thủ", "Khách quen", "Người lạ"], correct: [3] },
-      { lesson: 7, type: "SINGLE", text: "Câu 17: Nền tảng nào mạnh về video ngắn (dưới 60s) và thu hút nhóm 15-29 tuổi?", options: ["TikTok", "Zalo", "Facebook", "LinkedIn"], correct: [0] },
-      { lesson: 7, type: "SINGLE", text: "Câu 18: Để khách hàng dễ tìm thấy video trên YouTube, nhà sáng tạo cần làm kỹ thuật gì?", options: ["Livestream", "Chèn quảng cáo", "SEO video", "Gửi Email"], correct: [2] },
-      { lesson: 7, type: "SINGLE", text: "Câu 19: Startup muốn lấy thông tin khách hàng (leads) qua trang đơn lẻ có mục đích cụ thể nên tạo gì?", options: ["Website B2B", "Facebook Fanpage", "Landing Page", "Blog cá nhân"], correct: [2] },
-      { lesson: 7, type: "SINGLE", text: "Câu 20: Yếu tố quan trọng nhất khi phát triển kênh YouTube là sản xuất video với tần suất .....", options: ["Thường xuyên và liên tục", "Nhiều trong thời gian ngắn", "Tùy thuộc ngân sách", "Ít nhưng chất lượng"], correct: [0] },
-      { lesson: 7, type: "SINGLE", text: "Câu 21: Nhân viên văn phòng quen dùng công cụ gửi file trực tiếp và tin cậy. Kênh phù hợp nhất là:", options: ["Email Marketing", "Instagram", "TikTok", "Facebook Watch"], correct: [0] },
-      { lesson: 7, type: "SINGLE", text: "Câu 22: Dùng đồng hồ đếm ngược cho ưu đãi 50% trong 2 giờ tác động tâm lý gì?", options: ["Cá nhân hóa trải nghiệm", "Xây dựng niềm tin", "Tối ưu hiển thị di động", "Tạo sự khan hiếm và cấp bách (Urgency)."], correct: [3] },
+      { lesson: 7, type: "SINGLE", text: "Câu 5: Nhãn hàng mỹ phẩm muốn khách hàng tự tìm đến mình khi search \"cách trị mụn\". Nên ưu tiên công cụ nào?", options: ["A. Gửi tin nhắn SMS", "B. Telesales", "C. Phát tờ rơi", "D. SEO Website hoặc Quảng cáo Google"], correct: [3] },
+      { lesson: 7, type: "SINGLE", text: "Câu 6: Rao vặt sản phẩm trên hệ thống chợ trực tuyến tích hợp trong Facebook dùng tính năng nào?", options: ["A. Facebook Marketplace", "B. Facebook Watch", "C. Facebook Profile", "D. Facebook Groups"], correct: [0] },
+      { lesson: 7, type: "SINGLE", text: "Câu 7: Doanh nghiệp bị đưa tin tiêu cực trên các tờ báo điện tử lớn gây ra hậu quả gì?", options: ["A. Tăng giá trị tài sản số", "B. Tăng doanh số đột biến", "C. Giúp website chuẩn SEO hơn", "D. Suy giảm danh tiếng, tín nhiệm, thậm chí phá sản."], correct: [3] },
+      { lesson: 7, type: "SINGLE", text: "Câu 8: Tận dụng lượng người dùng khổng lồ và chủ động tìm kiếm trên các sàn .... giúp Content Marketing tiếp cận dễ dàng hơn.", options: ["A. Mạng xã hội", "B. Email", "C. Blog cá nhân", "D. Thương mại điện tử (Shopee, Lazada,...)"], correct: [3] },
+      { lesson: 7, type: "SINGLE", text: "Câu 9: Điền từ phù hợp: \".... được coi là kênh phân phối thông tin chính thức, giúp đảm bảo độ tin cậy cao hơn các kênh mạng xã hội.\"", options: ["A. Website", "B. Remarketing", "C. Email Marketing", "D. TV"], correct: [0] },
+      { lesson: 7, type: "MULTIPLE", text: "Câu 10: Những tính năng nào sau đây thuộc \"siêu ứng dụng\" Zalo? (Chọn 2 đáp án)", options: ["A. Zalo Pay", "B. Zalo seller", "C. Zalo OA", "D. Zalo Central"], correct: [0, 2] },
+      { lesson: 7, type: "MULTIPLE", text: "Câu 11: Hai chỉ số nào thường dùng để đo lường chi phí thu hút khách hàng trên nền tảng quảng cáo? (Chọn 2 đáp án)", options: ["A. NPS (Net Promoter Score)", "B. CPM (Cost Per Mille)", "C. CPC (Cost Per Click)", "D. CLV (Customer Lifetime Value)"], correct: [1, 2] },
+      { lesson: 7, type: "SINGLE", text: "Câu 12: Tại sao doanh nghiệp cần liên tục thu hút khách hàng mới trong môi trường số?", options: ["A. Để giảm lương nhân viên", "B. Để không phải khuyến mãi", "C. Để bù đắp lượng khách hàng rời bỏ (churn rate) tự nhiên.", "D. Để website nhiều ảnh hơn"], correct: [2] },
+      { lesson: 7, type: "SINGLE", text: "Câu 13: Chuyển đổi vi mô (Micro-conversion) được hiểu là gì?", options: ["A. Khách rời bỏ sau 3 giây", "B. Khách chia sẻ bài viết", "C. Hành động mang lại doanh thu trực tiếp", "D. Các bước đệm như điền form, tải tài liệu, thêm vào giỏ."], correct: [3] },
+      { lesson: 7, type: "SINGLE", text: "Câu 14: Khách thoát ngay vì trang tải quá chậm (trên 3s). Nguyên nhân gây thấp chuyển đổi là do:", options: ["A. Trải nghiệm người dùng (UX/UI) kém.", "B. Thông điệp thiếu thuyết phục.", "C. Ma sát phễu quá lớn.", "D. Sai tệp khách hàng."], correct: [0] },
+      { lesson: 7, type: "SINGLE", text: "Câu 15: Tối ưu hóa tỷ lệ chuyển đổi (CRO) là quy trình khoa học dựa trên ....", options: ["A. Ý kiến ban giám đốc", "B. Xu hướng đối thủ", "C. Dữ liệu (Analytics)", "D. Kinh nghiệm lâu năm"], correct: [2] },
+      { lesson: 7, type: "SINGLE", text: "Câu 16: Áp dụng linh hoạt các phương pháp tiếp cận giúp chuyển đổi .... thành người mua hàng dễ dàng hơn.", options: ["A. Khách hàng thân thiết", "B. Đối thủ", "C. Khách quen", "D. Người lạ"], correct: [3] },
+      { lesson: 7, type: "SINGLE", text: "Câu 17: Nền tảng nào mạnh về video ngắn (dưới 60s) và thu hút nhóm 15-29 tuổi?", options: ["A. TikTok", "B. Zalo", "C. Facebook", "D. LinkedIn"], correct: [0] },
+      { lesson: 7, type: "SINGLE", text: "Câu 18: Để khách hàng dễ tìm thấy video trên YouTube, nhà sáng tạo cần làm kỹ thuật gì?", options: ["A. Livestream", "B. Chèn quảng cáo", "C. SEO video", "D. Gửi Email"], correct: [2] },
+      { lesson: 7, type: "SINGLE", text: "Câu 19: Startup muốn lấy thông tin khách hàng (leads) qua trang đơn lẻ có mục đích cụ thể nên tạo gì?", options: ["A. Website B2B", "B. Facebook Fanpage", "C. Landing Page", "D. Blog cá nhân"], correct: [2] },
+      { lesson: 7, type: "SINGLE", text: "Câu 20: Yếu tố quan trọng nhất khi phát triển kênh YouTube là sản xuất video với tần suất .....", options: ["A. Thường xuyên và liên tục", "B. Nhiều trong thời gian ngắn", "C. Tùy thuộc ngân sách", "D. Ít nhưng chất lượng"], correct: [0] },
+      { lesson: 7, type: "SINGLE", text: "Câu 21: Nhân viên văn phòng quen dùng công cụ gửi file trực tiếp và tin cậy. Kênh phù hợp nhất là:", options: ["A. Email Marketing", "B. Instagram", "C. TikTok", "D. Facebook Watch"], correct: [0] },
+      { lesson: 7, type: "SINGLE", text: "Câu 22: Dùng đồng hồ đếm ngược cho ưu đãi 50% trong 2 giờ tác động tâm lý gì?", options: ["A. Cá nhân hóa trải nghiệm", "B. Xây dựng niềm tin", "C. Tối ưu hiển thị di động", "D. Tạo sự khan hiếm và cấp bách (Urgency)."], correct: [3] },
       { lesson: 7, type: "MATCHING", text: "Câu 23: Ghép nền tảng với đặc điểm phù hợp:", pairs: [{ item: "Instagram", match: "Chia sẻ hình ảnh" }, { item: "Email", match: "Công cụ văn phòng phổ biến" }, { item: "YouTube", match: "Kho video khổng lồ" }] },
-      { lesson: 7, type: "SINGLE", text: "Câu 24: Mã Pixel cần dữ liệu lớn (Big Data) để .... từ đó nhận diện chính xác chân dung khách hàng lý tưởng.", options: ["Xóa tài khoản giả", "Học - Machine Learning", "Tự động trả lời", "Lưu trữ thông tin"], correct: [1] },
-      { lesson: 7, type: "SINGLE", text: "Câu 25: Khi trải nghiệm xuất sắc, khách hàng sẽ trở thành những “…” giúp thu hút khách mới tự nhiên.", options: ["Trung gian phân phối", "Kênh tiềm năng", "Đại sứ thương hiệu", "Khách hàng thân thiết"], correct: [2] },
-      { lesson: 7, type: "SINGLE", text: "Câu 26: Doanh nghiệp ví mình như “chiếc xô bị thủng đáy” khi gặp tình trạng nào?", options: ["Không có ngân sách quảng cáo", "Có lượng truy cập (traffic) lớn nhưng tỉ lệ chuyển đổi thấp", "Chỉ có khách cũ quay lại", "Website bị hack"], correct: [1] },
-      { lesson: 7, type: "SINGLE", text: "Câu 27: Để nút kêu gọi hành động (CTA) đạt hiệu quả cao, doanh nghiệp nên làm gì?", options: ["Màu sắc trùng nền", "Đặt ở vị trí dễ thấy (trên nếp gấp trang) và màu sắc nổi bật", "Đặt ở cuối trang web dài", "Dùng từ chung chung như \"Gửi\""], correct: [1] },
-      { lesson: 7, type: "SINGLE", text: "Câu 28: Mục tiêu chính của quá trình tiếp cận khách hàng trực tuyến là gì?", options: ["Tăng số lượng sản phẩm bán ra", "Thu hút sự chú ý, thấu hiểu, và xây dựng mối quan hệ lâu dài", "Giảm chi phí sản xuất", "Tăng giá sản phẩm"], correct: [1] },
-      { lesson: 7, type: "SINGLE", text: "Câu 29: Doanh nghiệp cần truyền tải các thông điệp cung cấp giá trị nhằm giải quyết trực tiếp … của khách hàng.", options: ["Sở thích cá nhân", "Khả năng tài chính", "Yêu cầu giá rẻ", "Nỗi đau/khó khăn (Pain points)"], correct: [3] },
-      { lesson: 7, type: "SINGLE", text: "Câu 30: Quảng bá sản phẩm với Facebook và TikTok để tiếp cận khách hàng tiềm năng là phương pháp tiếp cận nào?", options: ["Marketing trực tiếp", "Mạng xã hội", "Email Marketing", "SEO"], correct: [1] },
+      { lesson: 7, type: "SINGLE", text: "Câu 24: Mã Pixel cần dữ liệu lớn (Big Data) để .... từ đó nhận diện chính xác chân dung khách hàng lý tưởng.", options: ["A. Xóa tài khoản giả", "B. Học - Machine Learning", "C. Tự động trả lời", "D. Lưu trữ thông tin"], correct: [1] },
+      { lesson: 7, type: "SINGLE", text: "Câu 25: Khi trải nghiệm xuất sắc, khách hàng sẽ trở thành những “…” giúp thu hút khách mới tự nhiên.", options: ["A. Trung gian phân phối", "B. Kênh tiềm năng", "C. Đại sứ thương hiệu", "D. Khách hàng thân thiết"], correct: [2] },
+      { lesson: 7, type: "SINGLE", text: "Câu 26: Doanh nghiệp ví mình như “chiếc xô bị thủng đáy” khi gặp tình trạng nào?", options: ["A. Không có ngân sách quảng cáo", "B. Có lượng truy cập (traffic) lớn nhưng tỉ lệ chuyển đổi thấp", "C. Chỉ có khách cũ quay lại", "D. Website bị hack"], correct: [1] },
+      { lesson: 7, type: "SINGLE", text: "Câu 27: Để nút kêu gọi hành động (CTA) đạt hiệu quả cao, doanh nghiệp nên làm gì?", options: ["A. Màu sắc trùng nền", "B. Đặt ở vị trí dễ thấy (trên nếp gấp trang) và màu sắc nổi bật", "C. Đặt ở cuối trang web dài", "D. Dùng từ chung chung như \"Gửi\""], correct: [1] },
+      { lesson: 7, type: "SINGLE", text: "Câu 28: Mục tiêu chính của quá trình tiếp cận khách hàng trực tuyến là gì?", options: ["A. Tăng số lượng sản phẩm bán ra", "B. Thu hút sự chú ý, thấu hiểu, và xây dựng mối quan hệ lâu dài", "C. Giảm chi phí sản xuất", "D. Tăng giá sản phẩm"], correct: [1] },
+      { lesson: 7, type: "SINGLE", text: "Câu 29: Doanh nghiệp cần truyền tải các thông điệp cung cấp giá trị nhằm giải quyết trực tiếp … của khách hàng.", options: ["A. Sở thích cá nhân", "B. Khả năng tài chính", "C. Yêu cầu giá rẻ", "D. Nỗi đau/khó khăn (Pain points)"], correct: [3] },
+      { lesson: 7, type: "SINGLE", text: "Câu 30: Quảng bá sản phẩm với Facebook và TikTok để tiếp cận khách hàng tiềm năng là phương pháp tiếp cận nào?", options: ["A. Marketing trực tiếp", "B. Mạng xã hội", "C. Email Marketing", "D. SEO"], correct: [1] },
 
       // BÀI 8
-      { lesson: 8, type: "SINGLE", text: "Câu 1: “Time-to-Market” (thời gian từ ý tưởng đến triển khai) là chỉ số thuộc khía cạnh nào trong BSC?", options: ["Tài chính", "Khách hàng", "Quy trình nội bộ", "Học tập và phát triển"], correct: [2] },
-      { lesson: 8, type: "SINGLE", text: "Câu 2: Khía cạnh …. Tập trung đo lường mức độ nhận diện thương hiệu và sự gắn kết của công chúng trên các nền tảng trực tuyến.", options: ["Quy trình nội bộ", "Tài chính", "Học tập và Phát triển", "Khách hàng"], correct: [3] },
-      { lesson: 8, type: "MULTIPLE", text: "Câu 3: Đâu là các chỉ số thuộc khía cạnh Tài chính trong mô hình BSC? (Chọn 2 đáp án)", options: ["Điểm số hài lòng khách hàng (NPS)", "Doanh thu trên chi phí quảng cáo (ROAS)", "Tốc độ tải trang website", "Tỷ suất hoàn vốn đầu tư (ROI)"], correct: [1, 3] },
-      { lesson: 8, type: "SINGLE", text: "Câu 4: So sánh chi phí thu hút khách hàng mới (CAC) với giá trị trọn đời (CLV) thuộc khía cạnh nào của BSC?", options: ["Quy trình nội bộ", "Khách hàng", "Tài chính", "Học tập và Phát triển"], correct: [2] },
-      { lesson: 8, type: "SINGLE", text: "Câu 5: Khắc phục lỗi thanh toán trên website thuộc về khía cạnh nào của BSC?", options: ["Quy trình nội bộ", "Tài chính", "Học tập và Phát triển", "Khách hàng"], correct: [0] },
-      { lesson: 8, type: "SINGLE", text: "Câu 6: Yêu cầu 100% nhân sự thực chiến đạt chứng chỉ Meta/Google Ads thuộc khía cạnh nào?", options: ["Học tập và phát triển", "Quy trình nội bộ", "Khách hàng", "Tài chính"], correct: [0] },
-      { lesson: 8, type: "SINGLE", text: "Câu 7: Thiết lập gói combo để tăng giá trị đơn hàng trung bình (AOV) phục vụ mục tiêu gì?", options: ["Tài chính – tăng trưởng doanh thu", "Học tập – đào tạo nhân viên", "Nội bộ - tăng tốc độ tải trang", "Khách hàng – giảm tỷ lệ thoát trang"], correct: [0] },
-      { lesson: 8, type: "SINGLE", text: "Câu 8: Mục tiêu trong kế hoạch Marketing số cần được xây dựng theo nguyên tắc ...", options: ["AIDA", "SWOT", "SMART", "POEM"], correct: [2] },
-      { lesson: 8, type: "SINGLE", text: "Câu 9: Bước …. Là cụ thể hóa chiến lược thành các công việc thực tế, phân bổ theo thời gian (Timeline).", options: ["Objectives (Mục tiêu)", "Action (Hành động)", "Control (Kiểm soát)", "Tactics (Chiến thuật)"], correct: [1] },
-      { lesson: 8, type: "SINGLE", text: "Câu 10: Mục tiêu \"Đạt doanh thu 500 triệu trong 3 tháng\" thuộc khía cạnh nào?", options: ["Thuộc khía cạnh tài chính", "Thuộc khía cạnh nội bộ", "Thuộc khía cạnh sáng tạo", "Thuộc khía cạnh khách hàng"], correct: [0] },
-      { lesson: 8, type: "SINGLE", text: "Câu 11: Gửi Email Newsletter chia sẻ kiến thức phân biệt trà sạch thuộc giai đoạn nào của phễu?", options: ["Sau phễu", "Cân nhắc", "Quyết định mua", "Nhận biết"], correct: [3] },
-      { lesson: 8, type: "SINGLE", text: "Câu 12: Ở tầng Nhận biết của phễu, hành động hiệu quả thường là chạy quảng cáo …. Và làm SEO nội dung rộng.", options: ["Bài viết bán hàng", "Video ngắn", "Email chốt đơn", "Hotline tư vấn"], correct: [1] },
-      { lesson: 8, type: "SINGLE", text: "Câu 13: Khắc họa khách hàng \"Chủ doanh nghiệp 30-50 tuổi thích đánh Golf\" thuộc bước nào?", options: ["Objectives", "Situation Analysis (Buyer Persona)", "Tactics", "Control"], correct: [1] },
-      { lesson: 8, type: "SINGLE", text: "Câu 14: Chạy quảng cáo bám đuôi (Remarketing) vào người bỏ giỏ hàng là hành động ở tầng nào?", options: ["Tầng Nhận biết", "Tầng Quyết định (Conversion)", "Tầng sau mua", "Tầng cân nhắc"], correct: [1] },
-      { lesson: 8, type: "SINGLE", text: "Câu 15: Việc xây dựng phễu chuyển đổi (Marketing Funnel) thuộc giai đoạn nào trong SOSTAC?", options: ["Control", "Strategy - Chiến lược", "Situation Analysis", "Tactics & Action"], correct: [1] },
-      { lesson: 8, type: "SINGLE", text: "Câu 16: Khía cạnh Học tập và Phát triển là nền móng thúc đẩy sự … liên tục, nâng cao năng lực công nghệ.", options: ["Đổi mới", "Quảng cáo", "Tiết kiệm", "Cạnh tranh"], correct: [0] },
+      { lesson: 8, type: "SINGLE", text: "Câu 1: “Time-to-Market” (thời gian từ ý tưởng đến triển khai) là chỉ số thuộc khía cạnh nào trong BSC?", options: ["A. Tài chính", "B. Khách hàng", "C. Quy trình nội bộ", "D. Học tập và phát triển"], correct: [2] },
+      { lesson: 8, type: "SINGLE", text: "Câu 2: Khía cạnh …. Tập trung đo lường mức độ nhận diện thương hiệu và sự gắn kết của công chúng trên các nền tảng trực tuyến.", options: ["A. Quy trình nội bộ", "B. Tài chính", "C. Học tập và Phát triển", "D. Khách hàng"], correct: [3] },
+      { lesson: 8, type: "MULTIPLE", text: "Câu 3: Đâu là các chỉ số thuộc khía cạnh Tài chính trong mô hình BSC? (Chọn 2 đáp án)", options: ["A. Điểm số hài lòng khách hàng (NPS)", "B. Doanh thu trên chi phí quảng cáo (ROAS)", "C. Tốc độ tải trang website", "D. Tỷ suất hoàn vốn đầu tư (ROI)"], correct: [1, 3] },
+      { lesson: 8, type: "SINGLE", text: "Câu 4: So sánh chi phí thu hút khách hàng mới (CAC) với giá trị trọn đời (CLV) thuộc khía cạnh nào của BSC?", options: ["A. Quy trình nội bộ", "B. Khách hàng", "C. Tài chính", "D. Học tập và Phát triển"], correct: [2] },
+      { lesson: 8, type: "SINGLE", text: "Câu 5: Khắc phục lỗi thanh toán trên website thuộc về khía cạnh nào của BSC?", options: ["A. Quy trình nội bộ", "B. Tài chính", "C. Học tập và Phát triển", "D. Khách hàng"], correct: [0] },
+      { lesson: 8, type: "SINGLE", text: "Câu 6: Yêu cầu 100% nhân sự thực chiến đạt chứng chỉ Meta/Google Ads thuộc khía cạnh nào?", options: ["A. Học tập và phát triển", "B. Quy trình nội bộ", "C. Khách hàng", "D. Tài chính"], correct: [0] },
+      { lesson: 8, type: "SINGLE", text: "Câu 7: Thiết lập gói combo để tăng giá trị đơn hàng trung bình (AOV) phục vụ mục tiêu gì?", options: ["A. Tài chính – tăng trưởng doanh thu", "B. Học tập – đào tạo nhân viên", "C. Nội bộ - tăng tốc độ tải trang", "D. Khách hàng – giảm tỷ lệ thoát trang"], correct: [0] },
+      { lesson: 8, type: "SINGLE", text: "Câu 8: Mục tiêu trong kế hoạch Marketing số cần được xây dựng theo nguyên tắc ...", options: ["A. AIDA", "B. SWOT", "C. SMART", "D. POEM"], correct: [2] },
+      { lesson: 8, type: "SINGLE", text: "Câu 9: Bước …. Là cụ thể hóa chiến lược thành các công việc thực tế, phân bổ theo thời gian (Timeline).", options: ["A. Objectives (Mục tiêu)", "B. Action (Hành động)", "C. Control (Kiểm soát)", "D. Tactics (Chiến thuật)"], correct: [1] },
+      { lesson: 8, type: "SINGLE", text: "Câu 10: Mục tiêu \"Đạt doanh thu 500 triệu trong 3 tháng\" thuộc khía cạnh nào?", options: ["A. Thuộc khía cạnh tài chính", "B. Thuộc khía cạnh nội bộ", "C. Thuộc khía cạnh sáng tạo", "D. Thuộc khía cạnh khách hàng"], correct: [0] },
+      { lesson: 8, type: "SINGLE", text: "Câu 11: Gửi Email Newsletter chia sẻ kiến thức phân biệt trà sạch thuộc giai đoạn nào của phễu?", options: ["A. Sau phễu", "B. Cân nhắc", "C. Quyết định mua", "D. Nhận biết"], correct: [3] },
+      { lesson: 8, type: "SINGLE", text: "Câu 12: Ở tầng Nhận biết của phễu, hành động hiệu quả thường là chạy quảng cáo …. Và làm SEO nội dung rộng.", options: ["A. Bài viết bán hàng", "B. Video ngắn", "C. Email chốt đơn", "D. Hotline tư vấn"], correct: [1] },
+      { lesson: 8, type: "SINGLE", text: "Câu 13: Khắc họa khách hàng \"Chủ doanh nghiệp 30-50 tuổi thích đánh Golf\" thuộc bước nào?", options: ["A. Objectives", "B. Situation Analysis (Buyer Persona)", "C. Tactics", "D. Control"], correct: [1] },
+      { lesson: 8, type: "SINGLE", text: "Câu 14: Chạy quảng cáo bám đuôi (Remarketing) vào người bỏ giỏ hàng là hành động ở tầng nào?", options: ["A. Tầng Nhận biết", "B. Tầng Quyết định (Conversion)", "C. Tầng sau mua", "D. Tầng cân nhắc"], correct: [1] },
+      { lesson: 8, type: "SINGLE", text: "Câu 15: Việc xây dựng phễu chuyển đổi (Marketing Funnel) thuộc giai đoạn nào trong SOSTAC?", options: ["A. Control", "B. Strategy - Chiến lược", "C. Situation Analysis", "D. Tactics & Action"], correct: [1] },
+      { lesson: 8, type: "SINGLE", text: "Câu 16: Khía cạnh Học tập và Phát triển là nền móng thúc đẩy sự … liên tục, nâng cao năng lực công nghệ.", options: ["A. Đổi mới", "B. Quảng cáo", "C. Tiết kiệm", "D. Cạnh tranh"], correct: [0] },
       { lesson: 8, type: "MATCHING", text: "Câu 17: Ghép chỉ số với khía cạnh BSC phù hợp:", pairs: [{ item: "MarTech Adoption", match: "Học tập & Phát triển" }, { item: "Conversion Rate", match: "Khách hàng" }, { item: "Response Time", match: "Quy trình nội bộ" }] },
-      { lesson: 8, type: "SINGLE", text: "Câu 18: Nếu phát hiện tỷ lệ thoát trang (Bounce Rate) quá cao, doanh nghiệp nên kiểm tra lại bước nào trong SOSTAC?", options: ["Ngân sách", "Mục tiêu", "Situation Analysis (Phân tích tình huống)", "Kế hoạch nội dung"], correct: [2] },
-      { lesson: 8, type: "SINGLE", text: "Câu 20: Vai trò chính của Thẻ điểm cân bằng (BSC) trong Marketing số là gì?", options: ["Liệt kê đối thủ", "Chuyển đổi mục tiêu chiến lược thành các chỉ số đo lường hiệu suất (KPI) cụ thể", "Tính bảng lương", "Thiết kế mẫu quảng cáo"], correct: [1] },
-      { lesson: 8, type: "SINGLE", text: "Câu 21: Theo dõi chỉ số NPS (Net Promoter Score) thuộc khía cạnh nào của BSC?", options: ["Khía cạnh khách hàng", "Khía cạnh Quy trình nội bộ", "Khía cạnh Tài chính", "Khía cạnh Học tập và Phát triển"], correct: [0] },
-      { lesson: 8, type: "SINGLE", text: "Câu 22: Tốc độ phản hồi tin nhắn của trực trang (Response Time) dưới 5 phút giúp tối ưu khía cạnh:", options: ["Học tập và phát triển", "Quy trình nội bộ", "Tài chính", "Khách hàng"], correct: [1] },
-      { lesson: 8, type: "SINGLE", text: "Câu 23: Khía cạnh Quy trình nội bộ đòi hỏi độ… của tệp dữ liệu khách hàng trên hệ thống CRM phải đạt mức cao nhất.", options: ["Rẻ", "Sạch", "Phức tạp", "Lớn"], correct: [1] },
-      { lesson: 8, type: "MULTIPLE", text: "Câu 24: Đâu là các chỉ số đo lường hiệu suất cốt lõi (KPIs) ở bước Control? (Chọn 2 đáp án)", options: ["Chi phí trên mỗi hành động (CPA)", "Tỷ lệ nhấp (CTR)", "Địa chỉ văn phòng đối thủ", "Số lượng nhân viên"], correct: [0, 1] },
-      { lesson: 8, type: "SINGLE", text: "Câu 25: Rà soát số liệu hàng tuần để tắt mẫu quảng cáo kém hiệu quả thuộc bước nào?", options: ["Tactics", "Strategy", "Control – Kiểm soát & Tối ưu", "Situation Analysis"], correct: [2] },
-      { lesson: 8, type: "SINGLE", text: "Câu 26: Xác định thông điệp cốt lõi \"Trà sạch nghệ nhân - Đẳng cấp quà tặng di sản\" thuộc bước nào?", options: ["Situation Analysis", "Objectives", "Strategy - Chiến lược", "Action"], correct: [2] },
-      { lesson: 8, type: "SINGLE", text: "Câu 27: Bước \"Strategy\" (Chiến lược) trong SOSTAC tập trung trả lời câu hỏi nào?", options: ["Ai là người thực hiện", "Chúng ta muốn tới đâu?", "Chúng ta làm thế nào để đến được đó (lộ trình tổng thể)?", "Chúng ta đang ở đâu?"], correct: [2] },
-      { lesson: 8, type: "SINGLE", text: "Câu 28: Các công cụ quảng cáo như Pixel cần Big Data để … từ đó nhận diện chính xác chân dung khách hàng.", options: ["Quảng cáo", "Phân tích", "Học - Machine Learning", "Bán hàng"], correct: [2] },
-      { lesson: 8, type: "SINGLE", text: "Câu 29: Dùng AI (MarTech Adoption) để tự động hóa chăm sóc khách hàng là ví dụ của khía cạnh nào?", options: ["Khách hàng", "Tài chính", "Quy trình nội bộ", "Học tập và phát triển"], correct: [3] },
-      { lesson: 8, type: "SINGLE", text: "Câu 30: Mô hình lập kế hoạch Marketing số phổ biến và chặt chẽ nhất được nhắc đến là mô hình nào?", options: ["AIDA", "4Ps", "SOSTAC", "POEM"], correct: [2] },
-      { lesson: 8, type: "SINGLE", text: "Câu 31: Chỉ số SEO Health Score (Sức khỏe SEO) phản ánh năng lực của doanh nghiệp ở khía cạnh nào?", options: ["Quy trình nội bộ", "Học tập và phát triển", "Tài chính", "Khách hàng"], correct: [0] },
+      { lesson: 8, type: "SINGLE", text: "Câu 18: Nếu phát hiện tỷ lệ thoát trang (Bounce Rate) quá cao, doanh nghiệp nên kiểm tra lại bước nào trong SOSTAC?", options: ["A. Ngân sách", "B. Mục tiêu", "C. Situation Analysis (Phân tích tình huống)", "D. Kế hoạch nội dung"], correct: [2] },
+      { lesson: 8, type: "SINGLE", text: "Câu 20: Vai trò chính của Thẻ điểm cân bằng (BSC) trong Marketing số là gì?", options: ["A. Liệt kê đối thủ", "B. Chuyển đổi mục tiêu chiến lược thành các chỉ số đo lường hiệu suất (KPI) cụ thể", "C. Tính bảng lương", "D. Thiết kế mẫu quảng cáo"], correct: [1] },
+      { lesson: 8, type: "SINGLE", text: "Câu 21: Theo dõi chỉ số NPS (Net Promoter Score) thuộc khía cạnh nào của BSC?", options: ["A. Khía cạnh khách hàng", "B. Khía cạnh Quy trình nội bộ", "C. Khía cạnh Tài chính", "D. Khía cạnh Học tập và Phát triển"], correct: [0] },
+      { lesson: 8, type: "SINGLE", text: "Câu 22: Tốc độ phản hồi tin nhắn của trực trang (Response Time) dưới 5 phút giúp tối ưu khía cạnh:", options: ["A. Học tập và phát triển", "B. Quy trình nội bộ", "C. Tài chính", "D. Khách hàng"], correct: [1] },
+      { lesson: 8, type: "SINGLE", text: "Câu 23: Khía cạnh Quy trình nội bộ đòi hỏi độ… của tệp dữ liệu khách hàng trên hệ thống CRM phải đạt mức cao nhất.", options: ["A. Rẻ", "B. Sạch", "C. Phức tạp", "D. Lớn"], correct: [1] },
+      { lesson: 8, type: "MULTIPLE", text: "Câu 24: Đâu là các chỉ số đo lường hiệu suất cốt lõi (KPIs) ở bước Control? (Chọn 2 đáp án)", options: ["A. Chi phí trên mỗi hành động (CPA)", "B. Tỷ lệ nhấp (CTR)", "C. Địa chỉ văn phòng đối thủ", "D. Số lượng nhân viên"], correct: [0, 1] },
+      { lesson: 8, type: "SINGLE", text: "Câu 25: Rà soát số liệu hàng tuần để tắt mẫu quảng cáo kém hiệu quả thuộc bước nào?", options: ["A. Tactics", "B. Strategy", "C. Control – Kiểm soát & Tối ưu", "D. Situation Analysis"], correct: [2] },
+      { lesson: 8, type: "SINGLE", text: "Câu 26: Xác định thông điệp cốt lõi \"Trà sạch nghệ nhân - Đẳng cấp quà tặng di sản\" thuộc bước nào?", options: ["A. Situation Analysis", "B. Objectives", "C. Strategy - Chiến lược", "D. Action"], correct: [2] },
+      { lesson: 8, type: "SINGLE", text: "Câu 27: Bước \"Strategy\" (Chiến lược) trong SOSTAC tập trung trả lời câu hỏi nào?", options: ["A. Ai là người thực hiện", "B. Chúng ta muốn tới đâu?", "C. Chúng ta làm thế nào để đến được đó (lộ trình tổng thể)?", "D. Chúng ta đang ở đâu?"], correct: [2] },
+      { lesson: 8, type: "SINGLE", text: "Câu 28: Các công cụ quảng cáo như Pixel cần Big Data để … từ đó nhận diện chính xác chân dung khách hàng.", options: ["A. Quảng cáo", "B. Phân tích", "C. Học - Machine Learning", "D. Bán hàng"], correct: [2] },
+      { lesson: 8, type: "SINGLE", text: "Câu 29: Dùng AI (MarTech Adoption) để tự động hóa chăm sóc khách hàng là ví dụ của khía cạnh nào?", options: ["A. Khách hàng", "B. Tài chính", "C. Quy trình nội bộ", "D. Học tập và phát triển"], correct: [3] },
+      { lesson: 8, type: "SINGLE", text: "Câu 30: Mô hình lập kế hoạch Marketing số phổ biến và chặt chẽ nhất được nhắc đến là mô hình nào?", options: ["A. AIDA", "B. 4Ps", "C. SOSTAC", "D. POEM"], correct: [2] },
+      { lesson: 8, type: "SINGLE", text: "Câu 31: Chỉ số SEO Health Score (Sức khỏe SEO) phản ánh năng lực của doanh nghiệp ở khía cạnh nào?", options: ["A. Quy trình nội bộ", "B. Học tập và phát triển", "C. Tài chính", "D. Khách hàng"], correct: [0] },
 
       // BÀI 9
-      { lesson: 9, type: "SINGLE", text: "Câu 1: Tại cửa sổ Variable View trong SPSS, cột …. dùng để gán số cho các câu trả lời định tính (VD: 1 = Nam, 2 = Nữ).", options: ["Values", "Missing", "Measure", "Name"], correct: [0] },
-      { lesson: 9, type: "SINGLE", text: "Câu 2: Kiểm định Chi-square (χ²) trong SPSS thường dùng để tìm mối liên hệ giữa các loại biến nào?", options: ["Biến định lượng (Thu nhập và Tuổi).", "Biến phụ thuộc và biến độc lập.", "Biến định danh (Giới tính và Dạng nội dung ưa thích).", "Biến rác và biến sạch."], correct: [2] },
-      { lesson: 9, type: "SINGLE", text: "Câu 3: Kỹ thuật nào trong SPSS giúp tự động nhóm khách hàng có chung đặc điểm hành vi thành các cụm biệt lập?", options: ["Phân tích nhân tố", "Kiểm định Chi-square", "Phân tích hồi quy", "Phân tích phân cụm (Cluster Analysis)"], correct: [3] },
-      { lesson: 9, type: "SINGLE", text: "Câu 4: Hệ số …. trong phân tích nhân tố EFA giúp kiểm tra giá trị hội tụ và giá trị phân biệt của thang đo.", options: ["R bình phương (R²)", "Factor Loading (Tải nhân tố)", "Sig.", "Beta"], correct: [1] },
-      { lesson: 9, type: "SINGLE", text: "Câu 5: Để đo lường thang đo Likert (1 - Rất không đồng ý đến 5 - Rất đồng ý), trong cột Measure ta chọn:", options: ["Ordinal", "Scale", "Nominal", "String"], correct: [1] },
-      { lesson: 9, type: "SINGLE", text: "Câu 6: Chìa khóa để chấp nhận một giả thuyết nghiên cứu có ý nghĩa thống kê là giá trị Sig. (P-value) phải …. ", options: ["≥ 1.0", "> 0.05", "= 1.0", "< 0.05"], correct: [3] },
-      { lesson: 9, type: "SINGLE", text: "Câu 7: Muốn biết mức độ tác động của “Sự tin tưởng vào Fanpage” đến “Ý định mua hàng”, nên dùng phép phân tích nào?", options: ["Hồi quy tuyến tính (Linear Regression)", "Lập bảng chéo Crosstabs", "Kiểm định T-test", "Thống kê mô tả"], correct: [0] },
+      { lesson: 9, type: "SINGLE", text: "Câu 1: Tại cửa sổ Variable View trong SPSS, cột …. dùng để gán số cho các câu trả lời định tính (VD: 1 = Nam, 2 = Nữ).", options: ["A. Values", "B. Missing", "C. Measure", "D. Name"], correct: [0] },
+      { lesson: 9, type: "SINGLE", text: "Câu 2: Kiểm định Chi-square (χ²) trong SPSS thường dùng để tìm mối liên hệ giữa các loại biến nào?", options: ["A. Biến định lượng (Thu nhập và Tuổi).", "B. Biến phụ thuộc và biến độc lập.", "C. Biến định danh (Giới tính và Dạng nội dung ưa thích).", "D. Biến rác và biến sạch."], correct: [2] },
+      { lesson: 9, type: "SINGLE", text: "Câu 3: Kỹ thuật nào trong SPSS giúp tự động nhóm khách hàng có chung đặc điểm hành vi thành các cụm biệt lập?", options: ["A. Phân tích nhân tố", "B. Kiểm định Chi-square", "C. Phân tích hồi quy", "D. Phân tích phân cụm (Cluster Analysis)"], correct: [3] },
+      { lesson: 9, type: "SINGLE", text: "Câu 4: Hệ số …. trong phân tích nhân tố EFA giúp kiểm tra giá trị hội tụ và giá trị phân biệt của thang đo.", options: ["A. R bình phương (R²)", "B. Factor Loading (Tải nhân tố)", "C. Sig.", "D. Beta"], correct: [1] },
+      { lesson: 9, type: "SINGLE", text: "Câu 5: Để đo lường thang đo Likert (1 - Rất không đồng ý đến 5 - Rất đồng ý), trong cột Measure ta chọn:", options: ["A. Ordinal", "B. Scale", "C. Nominal", "D. String"], correct: [1] },
+      { lesson: 9, type: "SINGLE", text: "Câu 6: Chìa khóa để chấp nhận một giả thuyết nghiên cứu có ý nghĩa thống kê là giá trị Sig. (P-value) phải …. ", options: ["A. ≥ 1.0", "B. > 0.05", "C. = 1.0", "D. < 0.05"], correct: [3] },
+      { lesson: 9, type: "SINGLE", text: "Câu 7: Muốn biết mức độ tác động của “Sự tin tưởng vào Fanpage” đến “Ý định mua hàng”, nên dùng phép phân tích nào?", options: ["A. Hồi quy tuyến tính (Linear Regression)", "B. Lập bảng chéo Crosstabs", "C. Kiểm định T-test", "D. Thống kê mô tả"], correct: [0] },
       { lesson: 9, type: "MATCHING", text: "Câu 8: Ghép loại thang đo phù hợp với biến khảo sát trong SPSS:", pairs: [{ item: "Giới tính", match: "Nominal" }, { item: "Học vấn", match: "Ordinal" }, { item: "Thu nhập", match: "Scale" }] },
-      { lesson: 9, type: "SINGLE", text: "Câu 9: Muốn loại bỏ các câu hỏi gây nhiễu cho thang đo Likert, ta nhìn vào cột nào trong bảng kết quả Reliability?", options: ["Standard Deviation", "Cronbach’s Alpha if Item Deleted", "Frequency", "Mean"], correct: [1] },
-      { lesson: 9, type: "SINGLE", text: "Câu 10: Trong bảng ANOVA của mô hình hồi quy, nếu giá trị Sig. là 0.000 có nghĩa là gì?", options: ["Toàn bộ mô hình hồi quy đạt ý nghĩa thống kê và sử dụng được.", "Mô hình không có giá trị.", "Cần nhập lại dữ liệu.", "Các biến độc lập không tác động đến biến phụ thuộc."], correct: [0] },
-      { lesson: 9, type: "SINGLE", text: "Câu 11: Phân tích biến thiên ANOVA thường được dùng để làm gì?", options: ["Thu thập dữ liệu", "Xây dựng mô hình dự báo", "Kiểm tra độ tin cậy thang đo", "So sánh trung bình của nhiều nhóm (từ 3 nhóm trở lên)."], correct: [3] },
-      { lesson: 9, type: "SINGLE", text: "Câu 12: Trong hồi quy tuyến tính, hệ số …. chuẩn hóa chỉ ra yếu tố trọng tâm cần ưu tiên tối ưu hóa trước.", options: ["KMO", "Alpha", "Sig.", "Beta"], correct: [3] },
-      { lesson: 9, type: "SINGLE", text: "Câu 13: Gom 20 động lực mua hàng thành 4 nhóm chính là sử dụng kỹ thuật gì?", options: ["Kiểm định T-test", "Phân tích nhân tố khám phá (EFA)", "Hồi quy tuyến tính", "Thống kê mô tả"], correct: [1] },
-      { lesson: 9, type: "MULTIPLE", text: "Câu 14: Các hình thức thu thập dữ liệu phổ biến cho SPSS hiện nay là gì? (Chọn 2 đáp án)", options: ["Khảo sát trực tiếp (Phiếu hỏi giấy).", "Theo dõi camera an ninh.", "Đọc trộm tin nhắn.", "Khảo sát trực tuyến (Google Forms)."], correct: [0, 3] },
-      { lesson: 9, type: "SINGLE", text: "Câu 15: Cửa sổ nào trong SPSS hiển thị dữ liệu thực tế với mỗi hàng là một đối tượng và mỗi cột là biến số?", options: ["Variable View", "Output Viewer", "Syntax Editor", "Data View"], correct: [3] },
-      { lesson: 9, type: "SINGLE", text: "Câu 16: Muốn so sánh giữa 2 nhóm thu nhập cao và thấp ta sử dụng phép kiểm định nào?", options: ["Independent Samples T-Test", "Cronbach’s Alpha", "ANOVA", "Hồi quy tuyến tính"], correct: [0] },
-      { lesson: 9, type: "SINGLE", text: "Câu 17: Một thang đo được coi là đạt yêu cầu về độ tin cậy nếu hệ số Cronbach’s Alpha đạt từ …. trở lên.", options: ["0.9", "0.6", "0.5", "0.3"], correct: [1] },
-      { lesson: 9, type: "SINGLE", text: "Câu 18: Hệ số Cronbach’s Alpha dùng để đo lường điều gì trong nghiên cứu Marketing?", options: ["Sự khác biệt giữa hai nhóm", "Độ lớn của doanh thu", "Mối quan hệ nhân quả", "Độ tin cậy của thang đo (Reliability)."], correct: [3] },
-      { lesson: 9, type: "SINGLE", text: "Câu 19: Để đảm bảo không có lỗi nhập liệu (biến Giới tính xuất hiện số 3), người nghiên cứu cần làm gì?", options: ["Vẽ biểu đồ", "Chạy hồi quy ngay", "Làm sạch dữ liệu (Data Cleaning)", "Phân tích nhân tố"], correct: [2] },
-      { lesson: 9, type: "SINGLE", text: "Câu 20: Mục tiêu cuối cùng của việc sử dụng SPSS trong tối ưu hóa Marketing số là gì?", options: ["Không dùng công cụ Google", "Đạt tỷ lệ chuyển đổi cao nhất với chi phí tối ưu nhất.", "Thay thế nhân sự sáng tạo", "Làm báo cáo phức tạp hơn"], correct: [1] },
-      { lesson: 9, type: "SINGLE", text: "Câu 21: Khi biến phụ thuộc ở dạng nhị phân (1 = Mua hàng, 0 = Rời bỏ), ta sử dụng phép phân tích nào?", options: ["Hồi quy Logistic.", "Hồi quy tuyến tính.", "Kiểm định ANOVA.", "Phân tích tương quan."], correct: [0] },
-      { lesson: 9, type: "SINGLE", text: "Câu 22: Để kiểm tra hiện tượng đa cộng tuyến trong hồi quy, ta nhìn vào hệ số …. ", options: ["Beta", "VIF", "Sig.", "KMO"], correct: [1] },
-      { lesson: 9, type: "SINGLE", text: "Câu 23: Chỉ số nào cho biết tỷ lệ khách hàng quay lại xem bài viết so với khách truy cập mới?", options: ["Lượt chia sẻ", "Tỷ lệ chuyển đổi", "Tỷ lệ khách quay lại (Returning Visitors)", "Thời gian ở lại trang"], correct: [2] },
-      { lesson: 9, type: "SINGLE", text: "Câu 24: Trong SPSS, các bảng số liệu kết quả và biểu đồ sau khi phân tích sẽ xuất hiện tại cửa sổ nào?", options: ["Output Viewer", "Syntax Editor", "Variable View", "Data View"], correct: [0] },
-      { lesson: 9, type: "SINGLE", text: "Câu 25: Bước nào giúp loại bỏ các biến có hệ số “Corrected Item-Total Correlation” dưới 0.3?", options: ["Thống kê mô tả", "Phân tích hồi quy", "Phân tích nhân tố EFA", "Kiểm định độ tin cậy Cronbach’s Alpha"], correct: [3] },
-      { lesson: 9, type: "MULTIPLE", text: "Câu 26: Việc sử dụng SPSS giúp nhà quản lý tránh được sai lầm nào khi ra quyết định Marketing? (Chọn 2 đáp án)", options: ["Tăng chi phí quảng cáo vô tội vạ.", "Ra quyết định theo cảm tính.", "Lãng phí ngân sách vào sai đối tượng.", "Ra quyết định dựa trên bằng chứng thực nghiệm."], correct: [1, 2] },
-      { lesson: 9, type: "SINGLE", text: "Câu 27: Muốn so sánh xem nhóm \"Thu nhập cao\" có hài lòng hơn nhóm \"Thu nhập thấp\" không, ta dùng phép kiểm định:", options: ["Independent-Samples T-Test hoặc ANOVA.", "Phân tích tương quan Pearson.", "Hồi quy Logistic.", "Cronbach's Alpha."], correct: [0] },
-      { lesson: 9, type: "SINGLE", text: "Câu 28: Chỉ số \"KMO and Bartlett's Test\" thường xuất hiện trong phép phân tích nào?", options: ["Thống kê mô tả", "Kiểm định T-test", "Hồi quy Logistic", "Phân tích nhân tố EFA"], correct: [3] },
-      { lesson: 9, type: "SINGLE", text: "Câu 29: So sánh mẫu quảng cáo A (KOL) và B (Review) có tạo sự khác biệt lượt click không, ta dùng:", options: ["Cronbach's Alpha", "Independent Samples T-Test", "Pearson", "Hồi quy tuyến tính"], correct: [1] },
-      { lesson: 9, type: "SINGLE", text: "Câu 30: Trong bảng hồi quy, chỉ số nào cho biết mức độ giải thích của mô hình?", options: ["Beta", "VIF", "Cronbach's Alpha", "R bình phương điều chỉnh (R² điều chỉnh)"], correct: [3] },
-      { lesson: 9, type: "SINGLE", text: "Câu 31: Trong Variable View, cột nào dùng để gán nhãn giải thích đầy đủ ý nghĩa cho tên biến ngắn gọn?", options: ["Measure", "Values", "Name", "Label"], correct: [3] }
+      { lesson: 9, type: "SINGLE", text: "Câu 9: Muốn loại bỏ các câu hỏi gây nhiễu cho thang đo Likert, ta nhìn vào cột nào trong bảng kết quả Reliability?", options: ["A. Standard Deviation", "B. Cronbach’s Alpha if Item Deleted", "C. Frequency", "D. Mean"], correct: [1] },
+      { lesson: 9, type: "SINGLE", text: "Câu 10: Trong bảng ANOVA của mô hình hồi quy, nếu giá trị Sig. là 0.000 có nghĩa là gì?", options: ["A. Toàn bộ mô hình hồi quy đạt ý nghĩa thống kê và sử dụng được.", "B. Mô hình không có giá trị.", "C. Cần nhập lại dữ liệu.", "D. Các biến độc lập không tác động đến biến phụ thuộc."], correct: [0] },
+      { lesson: 9, type: "SINGLE", text: "Câu 11: Phân tích biến thiên ANOVA thường được dùng để làm gì?", options: ["A. Thu thập dữ liệu", "B. Xây dựng mô hình dự báo", "C. Kiểm tra độ tin cậy thang đo", "D. So sánh trung bình của nhiều nhóm (từ 3 nhóm trở lên)."], correct: [3] },
+      { lesson: 9, type: "SINGLE", text: "Câu 12: Trong hồi quy tuyến tính, hệ số …. chuẩn hóa chỉ ra yếu tố trọng tâm cần ưu tiên tối ưu hóa trước.", options: ["A. KMO", "B. Alpha", "C. Sig.", "D. Beta"], correct: [3] },
+      { lesson: 9, type: "SINGLE", text: "Câu 13: Gom 20 động lực mua hàng thành 4 nhóm chính là sử dụng kỹ thuật gì?", options: ["A. Kiểm định T-test", "B. Phân tích nhân tố khám phá (EFA)", "C. Hồi quy tuyến tính", "D. Thống kê mô tả"], correct: [1] },
+      { lesson: 9, type: "MULTIPLE", text: "Câu 14: Các hình thức thu thập dữ liệu phổ biến cho SPSS hiện nay là gì? (Chọn 2 đáp án)", options: ["A. Khảo sát trực tiếp (Phiếu hỏi giấy).", "B. Theo dõi camera an ninh.", "C. Đọc trộm tin nhắn.", "D. Khảo sát trực tuyến (Google Forms)."], correct: [0, 3] },
+      { lesson: 9, type: "SINGLE", text: "Câu 15: Cửa sổ nào trong SPSS hiển thị dữ liệu thực tế với mỗi hàng là một đối tượng và mỗi cột là biến số?", options: ["A. Variable View", "B. Output Viewer", "C. Syntax Editor", "D. Data View"], correct: [3] },
+      { lesson: 9, type: "SINGLE", text: "Câu 16: Muốn so sánh giữa 2 nhóm thu nhập cao và thấp ta sử dụng phép kiểm định nào?", options: ["A. Independent Samples T-Test", "B. Cronbach’s Alpha", "C. ANOVA", "D. Hồi quy tuyến tính"], correct: [0] },
+      { lesson: 9, type: "SINGLE", text: "Câu 17: Một thang đo được coi là đạt yêu cầu về độ tin cậy nếu hệ số Cronbach’s Alpha đạt từ …. trở lên.", options: ["A. 0.9", "B. 0.6", "C. 0.5", "D. 0.3"], correct: [1] },
+      { lesson: 9, type: "SINGLE", text: "Câu 18: Hệ số Cronbach’s Alpha dùng để đo lường điều gì trong nghiên cứu Marketing?", options: ["A. Sự khác biệt giữa hai nhóm", "B. Độ lớn của doanh thu", "C. Mối quan hệ nhân quả", "D. Độ tin cậy của thang đo (Reliability)."], correct: [3] },
+      { lesson: 9, type: "SINGLE", text: "Câu 19: Để đảm bảo không có lỗi nhập liệu (biến Giới tính xuất hiện số 3), người nghiên cứu cần làm gì?", options: ["A. Vẽ biểu đồ", "B. Chạy hồi quy ngay", "C. Làm sạch dữ liệu (Data Cleaning)", "D. Phân tích nhân tố"], correct: [2] },
+      { lesson: 9, type: "SINGLE", text: "Câu 20: Mục tiêu cuối cùng của việc sử dụng SPSS trong tối ưu hóa Marketing số là gì?", options: ["A. Không dùng công cụ Google", "B. Đạt tỷ lệ chuyển đổi cao nhất với chi phí tối ưu nhất.", "C. Thay thế nhân sự sáng tạo", "D. Làm báo cáo phức tạp hơn"], correct: [1] },
+      { lesson: 9, type: "SINGLE", text: "Câu 21: Khi biến phụ thuộc ở dạng nhị phân (1 = Mua hàng, 0 = Rời bỏ), ta sử dụng phép phân tích nào?", options: ["A. Hồi quy Logistic.", "B. Hồi quy tuyến tính.", "C. Kiểm định ANOVA.", "D. Phân tích tương quan."], correct: [0] },
+      { lesson: 9, type: "SINGLE", text: "Câu 22: Để kiểm tra hiện tượng đa cộng tuyến trong hồi quy, ta nhìn vào hệ số …. ", options: ["A. Beta", "B. VIF", "C. Sig.", "D. KMO"], correct: [1] },
+      { lesson: 9, type: "SINGLE", text: "Câu 23: Chỉ số nào cho biết tỷ lệ khách hàng quay lại xem bài viết so với khách truy cập mới?", options: ["A. Lượt chia sẻ", "B. Tỷ lệ chuyển đổi", "C. Tỷ lệ khách quay lại (Returning Visitors)", "D. Thời gian ở lại trang"], correct: [2] },
+      { lesson: 9, type: "SINGLE", text: "Câu 24: Trong SPSS, các bảng số liệu kết quả và biểu đồ sau khi phân tích sẽ xuất hiện tại cửa sổ nào?", options: ["A. Output Viewer", "B. Syntax Editor", "C. Variable View", "D. Data View"], correct: [0] },
+      { lesson: 9, type: "SINGLE", text: "Câu 25: Bước nào giúp loại bỏ các biến có hệ số “Corrected Item-Total Correlation” dưới 0.3?", options: ["A. Thống kê mô tả", "B. Phân tích hồi quy", "C. Phân tích nhân tố EFA", "D. Kiểm định độ tin cậy Cronbach’s Alpha"], correct: [3] },
+      { lesson: 9, type: "MULTIPLE", text: "Câu 26: Việc sử dụng SPSS giúp nhà quản lý tránh được sai lầm nào khi ra quyết định Marketing? (Chọn 2 đáp án)", options: ["A. Tăng chi phí quảng cáo vô tội vạ.", "B. Ra quyết định theo cảm tính.", "C. Lãng phí ngân sách vào sai đối tượng.", "D. Ra quyết định dựa trên bằng chứng thực nghiệm."], correct: [1, 2] },
+      { lesson: 9, type: "SINGLE", text: "Câu 27: Muốn so sánh xem nhóm \"Thu nhập cao\" có hài lòng hơn nhóm \"Thu nhập thấp\" không, ta dùng phép kiểm định:", options: ["A. Independent-Samples T-Test hoặc ANOVA.", "B. Phân tích tương quan Pearson.", "C. Hồi quy Logistic.", "D. Cronbach's Alpha."], correct: [0] },
+      { lesson: 9, type: "SINGLE", text: "Câu 28: Chỉ số \"KMO and Bartlett's Test\" thường xuất hiện trong phép phân tích nào?", options: ["A. Thống kê mô tả", "B. Kiểm định T-test", "C. Hồi quy Logistic", "D. Phân tích nhân tố EFA"], correct: [3] },
+      { lesson: 9, type: "SINGLE", text: "Câu 29: So sánh mẫu quảng cáo A (KOL) và B (Review) có tạo sự khác biệt lượt click không, ta dùng:", options: ["A. Cronbach's Alpha", "B. Independent Samples T-Test", "C. Pearson", "D. Hồi quy tuyến tính"], correct: [1] },
+      { lesson: 9, type: "SINGLE", text: "Câu 30: Trong bảng hồi quy, chỉ số nào cho biết mức độ giải thích của mô hình?", options: ["A. Beta", "B. VIF", "C. Cronbach's Alpha", "D. R bình phương điều chỉnh (R² điều chỉnh)"], correct: [3] },
+      { lesson: 9, type: "SINGLE", text: "Câu 31: Trong Variable View, cột nào dùng để gán nhãn giải thích đầy đủ ý nghĩa cho tên biến ngắn gọn?", options: ["A. Measure", "B. Values", "C. Name", "D. Label"], correct: [3] }
     ];
 
-    // Engine States
     let currentQuestions = [];
     let currentIndex = 0;
-    let userAnswers = {}; // questionIndex -> user response
-    let isInstantFeedback = true;
+    let userAnswers = {};
+    let checkedState = {};
     let isSubmitted = false;
 
-    // Shuffle helper
     function shuffleArray(arr) {
       let array = [...arr];
       for (let i = array.length - 1; i > 0; i--) {
@@ -506,7 +515,6 @@
     function startQuiz() {
       const lessonVal = document.getElementById('lesson-select').value;
       const doShuffle = document.getElementById('shuffle-toggle').checked;
-      isInstantFeedback = document.getElementById('instant-feedback-toggle').checked;
 
       if (lessonVal === 'ALL') {
         currentQuestions = [...BANK];
@@ -520,6 +528,7 @@
 
       currentIndex = 0;
       userAnswers = {};
+      checkedState = {};
       isSubmitted = false;
 
       document.getElementById('start-view').classList.add('hidden');
@@ -528,7 +537,6 @@
       document.getElementById('quiz-header-status').classList.remove('hidden');
 
       document.getElementById('lesson-badge').innerText = lessonVal === 'ALL' ? 'Toàn bộ bài' : `Bài ${lessonVal}`;
-
       renderQuestion();
     }
 
@@ -536,26 +544,20 @@
       const q = currentQuestions[currentIndex];
       const total = currentQuestions.length;
 
-      // Update Header & Progress
       document.getElementById('progress-text').innerText = `Câu ${currentIndex + 1} / ${total}`;
       document.getElementById('question-number-badge').innerText = `Câu ${currentIndex + 1} / ${total}`;
       const percent = Math.round(((currentIndex + 1) / total) * 100);
       document.getElementById('progress-percent').innerText = `${percent}%`;
       document.getElementById('progress-bar-fill').style.width = `${percent}%`;
 
-      // Question Type Badge
       const typeMap = {
-        'SINGLE': 'Chọn 1 đáp án',
-        'MULTIPLE': 'Chọn nhiều đáp án',
-        'MATCHING': 'Ghép nối / Kéo thả',
-        'FILL': 'Điền từ vào chỗ trống'
+        'SINGLE': 'Chọn 1 đáp án (A,B,C,D)',
+        'MULTIPLE': 'Chọn nhiều đáp án (A,B,C,D)',
+        'MATCHING': 'Kéo thả ghép nối'
       };
       document.getElementById('question-type-badge').innerText = typeMap[q.type] || 'Trắc nghiệm';
-
-      // Question Text
       document.getElementById('question-text').innerText = q.text;
 
-      // Render Options based on Type
       const container = document.getElementById('options-container');
       container.innerHTML = '';
       const savedAns = userAnswers[currentIndex];
@@ -574,28 +576,40 @@
           container.appendChild(btn);
         });
       } else if (q.type === 'MATCHING') {
-        const matchesOptions = Array.from(new Set(q.pairs.map(p => p.match)));
-        q.pairs.forEach((pair, pairIdx) => {
-          const row = document.createElement('div');
-          row.className = "p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-3";
-          
-          const userVal = (savedAns && savedAns[pairIdx]) || '';
-          
-          let selectHtml = `<select onchange="handleMatchingSelect(${pairIdx}, this.value)" class="w-full md:w-auto bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">`;
-          selectHtml += `<option value="">-- Chọn vế ghép --</option>`;
-          matchesOptions.forEach(mOpt => {
-            selectHtml += `<option value="${mOpt}" ${userVal === mOpt ? 'selected' : ''}>${mOpt}</option>`;
-          });
-          selectHtml += `</select>`;
-
-          row.innerHTML = `<span class="font-medium text-slate-700 text-sm md:text-base">${pair.item}</span> <i class="ph ph-arrow-right text-slate-400 hidden md:inline"></i> ${selectHtml}`;
-          container.appendChild(row);
+        // Drag & Drop Matching Implementation
+        const matchesOptions = shuffleArray(Array.from(new Set(q.pairs.map(p => p.match))));
+        
+        let poolHtml = `<div class="mb-4 p-4 bg-indigo-50/50 rounded-xl border border-indigo-100">
+          <div class="text-xs font-bold text-indigo-800 mb-2 uppercase tracking-wider">Danh sách thẻ đáp án (Kéo thả hoặc bấm vào thẻ để chọn/thả):</div>
+          <div id="drag-pool" class="flex flex-wrap gap-2 min-h-[48px]">`;
+        
+        matchesOptions.forEach((mOpt, poolIdx) => {
+          const isPlaced = savedAns && Object.values(savedAns).includes(mOpt);
+          if (!isPlaced) {
+            poolHtml += `<div draggable="true" ondragstart="handleDragStart(event, '${mOpt}')" onclick="handleCardClick('${mOpt}')" class="draggable-card px-4 py-2 bg-white text-indigo-700 font-semibold text-sm rounded-lg border border-indigo-200 shadow-sm hover:shadow transition flex items-center gap-1.5"><i class="ph ph-dots-six-vertical text-slate-400"></i>${mOpt}</div>`;
+          }
         });
+        poolHtml += `</div></div>`;
+
+        let slotsHtml = `<div class="space-y-3">`;
+        q.pairs.forEach((pair, pairIdx) => {
+          const placedVal = (savedAns && savedAns[pairIdx]) || '';
+          slotsHtml += `<div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+            <span class="font-medium text-slate-700 text-sm md:text-base">${pair.item}</span>
+            <i class="ph ph-arrow-right text-slate-400 hidden md:inline"></i>
+            <div ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${pairIdx})" onclick="handleSlotClick(${pairIdx})" class="drop-zone w-full md:w-64 rounded-xl flex items-center justify-center p-2 bg-white text-sm font-medium">
+              ${placedVal ? `<span class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg font-semibold text-xs flex items-center gap-2">${placedVal} <i class="ph ph-x hover:text-amber-200" onclick="event.stopPropagation(); removeMatchingPair(${pairIdx})"></i></span>` : `<span class="text-slate-400 text-xs italic">Kéo thả hoặc bấm chọn thẻ vào đây</span>`}
+            </div>
+          </div>`;
+        });
+        slotsHtml += `</div>`;
+
+        container.innerHTML = poolHtml + slotsHtml;
       }
 
-      // Explanation / Feedback
+      // CHỈ HIỂN THỊ ĐÁP ÁN NẾU BẤM "KIỂM TRA ĐÁP ÁN" HOẶC ĐÃ NỘP BÀI
       const expBox = document.getElementById('explanation-box');
-      if (isSubmitted || (isInstantFeedback && savedAns !== undefined)) {
+      if (isSubmitted || checkedState[currentIndex]) {
         expBox.classList.remove('hidden');
         const isCorrect = checkAnswerCorrect(q, savedAns);
         
@@ -609,13 +623,12 @@
           expBox.innerHTML = `<div class="font-bold flex items-center gap-2"><i class="ph ph-check-circle text-lg"></i> Chính xác!</div>`;
         } else {
           expBox.className = "mt-6 p-4 rounded-xl border bg-rose-50 border-rose-200 text-rose-800 text-sm";
-          expBox.innerHTML = `<div class="font-bold flex items-center gap-2 mb-1"><i class="ph ph-x-circle text-lg"></i> Chưa đúng!</div><div><strong>Đáp án chuẩn:</strong> ${correctText}</div>`;
+          expBox.innerHTML = `<div class="font-bold flex items-center gap-2 mb-1"><i class="ph ph-x-circle text-lg"></i> Chưa chính xác!</div><div><strong>Đáp án chuẩn:</strong> ${correctText}</div>`;
         }
       } else {
         expBox.classList.add('hidden');
       }
 
-      // Nav buttons state
       document.getElementById('prev-btn').disabled = currentIndex === 0;
       if (currentIndex === total - 1) {
         document.getElementById('next-btn').classList.add('hidden');
@@ -623,6 +636,49 @@
       } else {
         document.getElementById('next-btn').classList.remove('hidden');
         document.getElementById('submit-btn').classList.add('hidden');
+      }
+    }
+
+    // Drag and Drop State
+    let draggedText = '';
+    let selectedCardText = '';
+
+    function handleDragStart(e, text) {
+      draggedText = text;
+      e.dataTransfer.setData('text/plain', text);
+    }
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.currentTarget.classList.add('drag-over');
+    }
+    function handleDragLeave(e) {
+      e.currentTarget.classList.remove('drag-over');
+    }
+    function handleDrop(e, pairIdx) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drag-over');
+      if (!userAnswers[currentIndex]) userAnswers[currentIndex] = {};
+      userAnswers[currentIndex][pairIdx] = draggedText;
+      renderQuestion();
+    }
+
+    // Touch/Click fallback for matching
+    function handleCardClick(text) {
+      selectedCardText = text;
+      alert(`Đã chọn thẻ "${text}". Bây giờ bấm vào ô muốn ghép nối!`);
+    }
+    function handleSlotClick(pairIdx) {
+      if (selectedCardText) {
+        if (!userAnswers[currentIndex]) userAnswers[currentIndex] = {};
+        userAnswers[currentIndex][pairIdx] = selectedCardText;
+        selectedCardText = '';
+        renderQuestion();
+      }
+    }
+    function removeMatchingPair(pairIdx) {
+      if (userAnswers[currentIndex] && userAnswers[currentIndex][pairIdx]) {
+        delete userAnswers[currentIndex][pairIdx];
+        renderQuestion();
       }
     }
 
@@ -644,10 +700,8 @@
       renderQuestion();
     }
 
-    function handleMatchingSelect(pairIdx, val) {
-      if (isSubmitted) return;
-      if (!userAnswers[currentIndex]) userAnswers[currentIndex] = {};
-      userAnswers[currentIndex][pairIdx] = val;
+    function checkCurrentAnswer() {
+      checkedState[currentIndex] = true;
       renderQuestion();
     }
 
@@ -709,7 +763,6 @@
     }
 
     function startRetryWrong() {
-      // Filter only questions that were incorrect or skipped
       const wrongQs = currentQuestions.filter((q, idx) => {
         const ans = userAnswers[idx];
         return !checkAnswerCorrect(q, ans);
@@ -718,6 +771,7 @@
       currentQuestions = wrongQs;
       currentIndex = 0;
       userAnswers = {};
+      checkedState = {};
       isSubmitted = false;
 
       document.getElementById('result-view').classList.add('hidden');
@@ -744,7 +798,7 @@
           btn.innerText = idx + 1;
 
           const ans = userAnswers[idx];
-          if (isSubmitted) {
+          if (isSubmitted || checkedState[idx]) {
             if (checkAnswerCorrect(q, ans)) {
               btn.className += "bg-emerald-500 text-white border-emerald-600";
             } else {
