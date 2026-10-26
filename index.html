@@ -39,7 +39,7 @@
         .btn-exam:hover { background-color: #b45309; }
         .btn-secondary { background-color: #64748b; width: auto; padding: 8px 16px; font-size: 14px; }
         .btn-secondary:hover { background-color: #475569; }
-        .btn-check { background-color: #0d9488; padding: 10px 16px; width: auto; font-size: 14px; }
+        .btn-check { background-color: #0d9488; padding: 10px 16px; width: auto; font-size: 14px; color: white; border: none; border-radius: 6px; cursor: pointer; }
         .btn-check:hover { background-color: #0f766e; }
 
         .quiz-progress-bar { display: flex; justify-content: space-between; align-items: center; background: #eff6ff; padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; font-size: 14px; }
@@ -56,7 +56,7 @@
         .tf-label { display: flex; align-items: center; cursor: pointer; font-size: 14px; font-weight: 600; }
         .tf-label input { margin-right: 6px; }
 
-        .fill-input { max-width: 100%; padding: 10px 14px; font-size: 15px; border: 1px solid var(--border-color); border-radius: 6px; margin-top: 5px; }
+        .fill-input { width: 100%; padding: 10px 14px; font-size: 15px; border: 1px solid var(--border-color); border-radius: 6px; margin-top: 5px; }
 
         .drag-container { margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 10px; background: #f1f5f9; padding: 12px; border-radius: 8px; }
         .draggable-tag { background: #2563eb; color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
@@ -115,7 +115,7 @@
 
         <div class="nav-buttons">
             <button class="btn btn-secondary" id="prev-btn" onclick="changeQuestion(-1)">⬅ Câu Trước</button>
-            <button class="btn btn-check" onclick="checkCurrentAnswer()">Kiểm Tra Đáp Án</button>
+            <button class="btn-check" onclick="checkCurrentAnswer()">Kiểm Tra Đáp Án</button>
             <button class="btn btn-secondary" id="next-btn" onclick="changeQuestion(1)">Câu Sau ➡</button>
         </div>
 
@@ -128,7 +128,7 @@
         <button class="btn btn-exam" id="review-wrong-btn" onclick="startReviewWrong()" style="margin-bottom: 15px; display: none;">Ôn Lại Các Câu Trả Lời Sai / Thiếu</button>
         <button class="btn btn-secondary" onclick="backToSelection()" style="width: 100%; margin-bottom: 25px;">Quay Về Trang Chọn Bài</button>
 
-        <h3 style="text-align: left; margin-bottom: 15px; color: #334155;" id="review-title">Chi Tiết Kết Quả:</h3>
+        <h3 style="text-align: left; margin-bottom: 15px; color: #334155;">Chi Tiết Kết Quả:</h3>
         <div id="review-list"></div>
     </div>
 </div>
@@ -2641,7 +2641,12 @@ function checkCurrentAnswer(isAutoRestore = false) {
         } else {
             feedbackDiv.className = 'feedback wrong';
             let correctTexts = correctAns.map(i => q.options[i]).join(', ');
-            feedbackDiv.innerHTML = `✖ Chưa đúng / Chưa đủ. Đáp án đúng là: <b>${correctTexts}</b>`; } } else if (q.type === 'tf') { let wrongCount = 0; q.subs.forEach((sub, subIdx) => { const card = document.getElementById(`tf-card-${subIdx}`);
+            feedbackDiv.innerHTML = `✖ Chưa đúng / Chưa đủ. Đáp án đúng là: <b>${correctTexts}</b>`;
+        }
+    } else if (q.type === 'tf') {
+        let wrongCount = 0;
+        q.subs.forEach((sub, subIdx) => {
+            const card = document.getElementById(`tf-card-${subIdx}`);
             if (card) {
                 card.classList.remove('correct-answer-highlight', 'wrong-answer-highlight');
                 const userChoice = saved ? saved[subIdx] : null;
@@ -2671,7 +2676,12 @@ function checkCurrentAnswer(isAutoRestore = false) {
             feedbackDiv.innerHTML = '✔ Chính xác!';
         } else {
             feedbackDiv.className = 'feedback wrong';
-            feedbackDiv.innerHTML = `✖ Chưa đúng. Đáp án chuẩn là: "<b>${q.answer}</b>"`; } } else if (q.type === 'match') { let wrongCount = 0; q.pairs.forEach((pair, pIdx) => { const card = document.getElementById(`match-card-${pIdx}`);
+            feedbackDiv.innerHTML = `✖ Chưa đúng. Đáp án chuẩn là: "<b>${q.answer}</b>"`;
+        }
+    } else if (q.type === 'match') {
+        let wrongCount = 0;
+        q.pairs.forEach((pair, pIdx) => {
+            const card = document.getElementById(`match-card-${pIdx}`);
             if (card) {
                 card.classList.remove('correct-answer-highlight', 'wrong-answer-highlight');
                 const userVal = saved ? saved[pIdx] : null;
@@ -2690,21 +2700,70 @@ function checkCurrentAnswer(isAutoRestore = false) {
             feedbackDiv.innerHTML = '✔ Ghép đúng tất cả!';
         } else {
             feedbackDiv.className = 'feedback wrong';
-            let correctPairs = q.pairs.map(p => `${p.item} ➔${p.correct}`).join(' | ');
-            feedbackDiv.innerHTML = `✖ Ghép chưa chính xác. Ghép đúng là: <b>${correctPairs}</b>`; } } }  function changeQuestion(step) { const nextIdx = currentQIndex + step; if (nextIdx >= 0 && nextIdx < activeQuestions.length) { currentQIndex = nextIdx; renderCurrentQuestion(); } }  function submitQuiz() { let correctCount = 0; wrongQuestionsList = []; const reviewContainer = document.getElementById('review-list'); reviewContainer.innerHTML = '';  activeQuestions.forEach((q, idx) => { const saved = userAnswersState[idx]; let isCorrect = true;  if (q.type === 'mc') { const userAns = Array.isArray(saved) ? saved : []; isCorrect = (userAns.length === q.correct.length) && userAns.every(v => q.correct.includes(v)); } else if (q.type === 'tf') { q.subs.forEach((sub, subIdx) => { const userVal = saved ? saved[subIdx] : null; if (userVal !== sub.correct) isCorrect = false; }); } else if (q.type === 'fill') { const userVal = (typeof saved === 'string' ? saved : '').trim().toLowerCase(); if (userVal !== q.answer.trim().toLowerCase()) isCorrect = false; } else if (q.type === 'match') { q.pairs.forEach((pair, pIdx) => { const userVal = saved ? saved[pIdx] : null; if (userVal !== pair.correct) isCorrect = false; }); }  if (isCorrect) { correctCount++; } else { wrongQuestionsList.push(q); }  const card = document.createElement('div'); card.className = `review-card ${isCorrect ? 'correct-answer-highlight' : 'wrong-answer-highlight'}`;
+            let correctPairs = q.pairs.map(p => `${p.item} ➔ ${p.correct}`).join(' | ');
+            feedbackDiv.innerHTML = `✖ Ghép chưa chính xác. Ghép đúng là: <b>${correctPairs}</b>`;
+        }
+    }
+}
+
+function changeQuestion(step) {
+    const nextIdx = currentQIndex + step;
+    if (nextIdx >= 0 && nextIdx < activeQuestions.length) {
+        currentQIndex = nextIdx;
+        renderCurrentQuestion();
+    }
+}
+
+function submitQuiz() {
+    let correctCount = 0;
+    wrongQuestionsList = [];
+    const reviewContainer = document.getElementById('review-list');
+    reviewContainer.innerHTML = '';
+
+    activeQuestions.forEach((q, idx) => {
+        const saved = userAnswersState[idx];
+        let isCorrect = true;
+
+        if (q.type === 'mc') {
+            const userAns = Array.isArray(saved) ? saved : [];
+            isCorrect = (userAns.length === q.correct.length) && userAns.every(v => q.correct.includes(v));
+        } else if (q.type === 'tf') {
+            q.subs.forEach((sub, subIdx) => {
+                const userVal = saved ? saved[subIdx] : null;
+                if (userVal !== sub.correct) isCorrect = false;
+            });
+        } else if (q.type === 'fill') {
+            const userVal = (typeof saved === 'string' ? saved : '').trim().toLowerCase();
+            if (userVal !== q.answer.trim().toLowerCase()) isCorrect = false;
+        } else if (q.type === 'match') {
+            q.pairs.forEach((pair, pIdx) => {
+                const userVal = saved ? saved[pIdx] : null;
+                if (userVal !== pair.correct) isCorrect = false;
+            });
+        }
+
+        if (isCorrect) {
+            correctCount++;
+        } else {
+            wrongQuestionsList.push(q);
+        }
+
+        const card = document.createElement('div');
+        card.className = `review-card ${isCorrect ? 'correct-answer-highlight' : 'wrong-answer-highlight'}`;
         
-        let cardHtml = `<div style="font-weight:bold; margin-bottom:8px;">Câu ${idx + 1}: ${q.q}</div>`; cardHtml += `<div>Trạng thái: <b>${isCorrect ? '✔ ĐÚNG' : '✖ SAI / CHỌN THIẾU'}</b></div>`;
+        let cardHtml = `<div style="font-weight:bold; margin-bottom:8px;">Câu ${idx + 1}: ${q.q}</div>`;
+        cardHtml += `<div>Trạng thái: <b>${isCorrect ? '✔ ĐÚNG' : '✖ SAI / CHỌN THIẾU'}</b></div>`;
 
         if (q.type === 'mc') {
             let correctText = q.correct.map(i => q.options[i]).join(', ');
             cardHtml += `<div style="font-size:13px; margin-top:4px;">Đáp án chuẩn: <b>${correctText}</b></div>`;
         } else if (q.type === 'tf') {
-            let correctText = q.subs.map(s => `${s.title}:${s.correct}`).join(' | ');
+            let correctText = q.subs.map(s => `${s.title}: ${s.correct}`).join(' | ');
             cardHtml += `<div style="font-size:13px; margin-top:4px;">Đáp án chuẩn: <b>${correctText}</b></div>`;
         } else if (q.type === 'fill') {
             cardHtml += `<div style="font-size:13px; margin-top:4px;">Đáp án chuẩn: <b>${q.answer}</b></div>`;
         } else if (q.type === 'match') {
-            let correctText = q.pairs.map(p => `${p.item} ➔${p.correct}`).join(' | ');
+            let correctText = q.pairs.map(p => `${p.item} ➔ ${p.correct}`).join(' | ');
             cardHtml += `<div style="font-size:13px; margin-top:4px;">Đáp án chuẩn: <b>${correctText}</b></div>`;
         }
 
@@ -2716,4 +2775,29 @@ function checkCurrentAnswer(isAutoRestore = false) {
     document.getElementById('result-screen').style.display = 'block';
 
     const scorePercent = ((correctCount / activeQuestions.length) * 100).toFixed(1);
-    document.getElementById('result-summary').innerHTML = `TỔNG KẾT BÀI THI: ${correctCount} /${activeQuestions.length}
+    document.getElementById('result-summary').innerHTML = `TỔNG KẾT BÀI THI: ${correctCount} / ${activeQuestions.length} CÂU ĐÚNG (${scorePercent}%)`;
+
+    const wrongBtn = document.getElementById('review-wrong-btn');
+    if (wrongQuestionsList.length > 0) {
+        wrongBtn.style.display = 'block';
+        wrongBtn.innerText = `Ôn Lại Các Câu Làm Sai / Chọn Thiếu (${wrongQuestionsList.length} câu)`;
+    } else {
+        wrongBtn.style.display = 'none';
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startReviewWrong() {
+    startQuiz(true, wrongQuestionsList);
+}
+
+function backToSelection() {
+    document.getElementById('quiz-screen').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'none';
+    document.getElementById('selection-screen').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
